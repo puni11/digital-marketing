@@ -24,23 +24,49 @@
                     },
                     colors: {
                         brand: {
-                            dark: '#160a35',       // Deepest purple/indigo background
-                            primary: '#2A1B54',    // Main purple card color
-                            secondary: '#452B88',  // Lighter purple
-                            accent: '#D4FF3E',     // Neon Lime / Yellow
-                            accentHover: '#c1eb2e',
-                            light: '#F8F7FC',      // Off-white for backgrounds
-                            gray: '#6B7280',
-                            textDark: '#0f0524',
-                            purpleBtn: '#6344F5',  // Match the button from the image
-                            purpleBtnHover: '#5234db'
+                            darker: '#111827',     // Deepest Gray/Black
+                            dark: '#1F2937',       // Main Dark Gray
+                            primary: '#F97316',    // Bright Orange
+                            primaryHover: '#EA580C',// Darker Orange
+                            secondary: '#374151',  // Mid Gray
+                            accent: '#FFEDD5',     // Light Orange / Peach
+                            light: '#F9FAFB',      // Off-white for backgrounds
+                            textDark: '#030712',
                         }
                     },
                     boxShadow: {
-                        'neon': '0 0 20px rgba(212, 255, 62, 0.4)',
-                        'floating': '0 30px 60px -15px rgba(22, 10, 53, 0.15)',
+                        'glow': '0 0 20px rgba(249, 115, 22, 0.4)',
+                        'floating': '0 30px 60px -15px rgba(17, 24, 39, 0.15)',
                         'card': '0 20px 40px -10px rgba(0,0,0,0.05)',
                         'inner-light': 'inset 0 2px 4px 0 rgba(255, 255, 255, 0.1)',
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                        'float-delayed': 'float-delayed 7s ease-in-out infinite',
+                        'scroll-ltr': 'scrollLeftToRight 35s linear infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                            '100%': { transform: 'translateY(0px)' },
+                        },
+                        'float-delayed': {
+                            '0%': { transform: 'translateY(-20px)' },
+                            '50%': { transform: 'translateY(0px)' },
+                            '100%': { transform: 'translateY(-20px)' },
+                        },
+                        scrollLeftToRight: {
+                            '0%': { transform: 'translateX(-50%)' },
+                            '100%': { transform: 'translateX(0%)' },
+                        }
                     }
                 }
             }
@@ -49,92 +75,73 @@
 
     <!-- Custom Styles & Animations -->
     <style>
-      html { scroll-behavior: smooth; }
+        html { scroll-behavior: smooth; }
         body {
-            color: #160a35;
-            background-color: #F8F7FC;
+            color: #111827;
+            background-color: #F9FAFB;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Animations --- */
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-        @keyframes float-delayed {
-            0% { transform: translateY(-20px); }
-            50% { transform: translateY(0px); }
-            100% { transform: translateY(-20px); }
-        }
-        @keyframes pulse-soft {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
-        }
-        @keyframes revealUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* Top Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: #F97316;
+            z-index: 100;
+            transition: width 0.1s ease-out;
         }
 
-        /* Left-to-Right Continuous Marquee */
-        @keyframes scrollLeftToRight {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0%); }
-        }
-
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .animate-float-delayed { animation: float-delayed 7s ease-in-out infinite; }
-        
+        /* --- Animations & Utilities --- */
         .marquee-ltr {
             display: flex;
-            width: 200%; /* Double width to accommodate duplication */
+            width: 200%;
             animation: scrollLeftToRight 35s linear infinite;
         }
-
-        /* Hover pause for marquee */
         .marquee-container:hover .marquee-ltr {
             animation-play-state: paused;
         }
 
         /* --- Scroll Reveal Classes --- */
-        .reveal {
+        .reveal, .reveal-left, .reveal-right, .reveal-scale {
             opacity: 0;
-            transform: translateY(40px);
             transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
         }
-        .reveal.active {
+        .reveal { transform: translateY(40px); }
+        .reveal-left { transform: translateX(-50px); }
+        .reveal-right { transform: translateX(50px); }
+        .reveal-scale { transform: scale(0.9); }
+        
+        .reveal.active, .reveal-left.active, .reveal-right.active, .reveal-scale.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: translate(0) scale(1);
         }
 
-        /* --- UI Utilities --- */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-        }
+        /* Delay utilities for staggered reveals */
+        .delay-100 { transition-delay: 100ms; }
+        .delay-200 { transition-delay: 200ms; }
+        .delay-300 { transition-delay: 300ms; }
 
         /* --- Custom Form Inputs (Light Theme for bottom) --- */
-        .input-floating {
-            position: relative;
-        }
+        .input-floating { position: relative; }
         .input-floating input, .input-floating select {
             width: 100%;
             padding: 1.25rem 1rem 0.5rem 1rem;
-            background: #F3F1F8;
+            background: #F3F4F6;
             border: 2px solid transparent;
             border-radius: 0.5rem;
             outline: none;
             transition: all 0.3s ease;
-            color: #160a35;
+            color: #111827;
             font-weight: 500;
         }
         .input-floating input:focus, .input-floating select:focus {
-            border-color: #2A1B54;
+            border-color: #F97316;
             background: #fff;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         }
         .input-floating label {
             position: absolute;
@@ -153,7 +160,7 @@
             top: 0.6rem;
             font-size: 0.65rem;
             font-weight: 600;
-            color: #2A1B54;
+            color: #F97316;
         }
 
         /* --- Custom Form Inputs (Dark Theme for Hero) --- */
@@ -165,23 +172,24 @@
             width: 100%;
             padding: 1.25rem 0.5rem 0.5rem 1rem;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(26, 26, 26, 0.323);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 8px;
             outline: none;
             transition: all 0.3s ease;
-            color: #000000;
+            color: #111827; /* Keeping text dark for the white form block */
             font-weight: 500;
         }
         .dark-input-floating input:focus, .dark-input-floating select:focus {
-            border-color: #5b3de3;
-            background: rgba(255,255,255,0.1);
+            border-color: #F97316;
+            background: rgba(249, 115, 22, 0.05);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         }
         .dark-input-floating label {
             position: absolute;
             left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #9CA3AF;
+            color: #6B7280;
             font-size: 0.9rem;
             transition: all 0.2s ease;
             pointer-events: none;
@@ -193,7 +201,7 @@
             top: 0.6rem;
             font-size: 0.65rem;
             font-weight: 600;
-            color: #000000;
+            color: #F97316;
         }
 
         /* --- Accordion (Curriculum) --- */
@@ -202,62 +210,84 @@
             grid-template-rows: 0fr;
             transition: grid-template-rows 0.4s ease;
         }
-        .accordion-content > div {
-            overflow: hidden;
-        }
-        .accordion-input:checked ~ .accordion-content {
-            grid-template-rows: 1fr;
-        }
-        .accordion-input:checked ~ label .icon-plus {
-            transform: rotate(45deg);
-        }
+        .accordion-content > div { overflow: hidden; }
+        .accordion-input:checked ~ .accordion-content { grid-template-rows: 1fr; }
         .accordion-input:checked ~ label {
-            color: #D4FF3E;
+            background-color: #FFF7ED;
+            border-left: 4px solid #F97316;
         }
+        .accordion-input:checked ~ label .number-indicator { color: #F97316; }
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #000; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
-        .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-    /* Hide scrollbar for IE, Edge and Firefox */
-    .no-scrollbar {
-      -ms-overflow-style: none;  /* IE and Edge */
-      scrollbar-width: none;  /* Firefox */
-    }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb:hover { background: #F97316; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Glassmorphism utility */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* --- Image Inspired Button Styles --- */
+        .btn-primary-img {
+            background: linear-gradient(180deg, #FF8D4D 0%, #F55910 100%);
+            box-shadow: 0px 2px 4px rgba(245, 89, 16, 0.25), inset 0px 1px 1px rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            text-shadow: 0px 1px 1px rgba(0,0,0,0.1);
+        }
+        .btn-primary-img:hover {
+            background: linear-gradient(180deg, #FF9B63 0%, #F76A28 100%);
+        }
+        .btn-secondary-img {
+            background: #FFFFFF;
+            color: #374151;
+            border-radius: 6px;
+            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05), 0px 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E5E7EB;
+        }
+        .btn-secondary-img:hover {
+            background: #F9FAFB;
+            box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
-<body class="antialiased selection:bg-brand-accent selection:text-brand-dark relative">
+<body class="antialiased selection:bg-brand-primary selection:text-white relative">
+
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
 
     <!-- ================= NAVBAR ================= -->
-    <!-- Navbar logic updated to handle dark hero initially, then light background -->
     <nav id="navbar" class="fixed w-full z-50 transition-all duration-300 py-5">
         <div class="container mx-auto px-6 lg:px-12">
-            <div id="nav-inner" class="bg-white rounded-lg px-8 py-3 flex justify-between items-center shadow-sm border border-white/10 transition-colors duration-300">
+            <div id="nav-inner" class="bg-white/90 backdrop-blur-md rounded-xl px-8 py-3 flex justify-between items-center shadow-sm border border-gray-200 transition-colors duration-300">
                 <!-- Logo -->
                 <a href="#" class="flex items-center gap-3 group">
-                    <img src="https://openshift.grras.com/frontassets/img/logo.png" alt="logo" class="w-16"/>
+                    <img src="https://openshift.grras.com/frontassets/img/logo.png" alt="logo" class="w-16 opacity-90 group-hover:grayscale-0 transition-all duration-300"/>
                 </a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center gap-8 text-sm font-semibold">
-                    <a href="#features" id="nav-link-1" class="text-gray-950  transition-colors">Features</a>
-                    <a href="#curriculum" id="nav-link-2" class="text-gray-950  transition-colors">Curriculum</a>
-                    <a href="#internship" id="nav-link-3" class="text-gray-950  transition-colors">Internship</a>
-                    <a href="#testimonial" id="nav-link-3" class="text-gray-950  transition-colors">Testimonials</a>
-                    <a href="#pricing" id="nav-link-4" class="text-gray-950 transition-colors">FAQs</a>
+                    <a href="#features" id="nav-link-1" class="text-gray-600 hover:text-brand-primary transition-colors">Features</a>
+                    <a href="#curriculum" id="nav-link-2" class="text-gray-600 hover:text-brand-primary transition-colors">Curriculum</a>
+                    <a href="#internship" id="nav-link-3" class="text-gray-600 hover:text-brand-primary transition-colors">Internship</a>
+                    <a href="#testimonial" id="nav-link-4" class="text-gray-600 hover:text-brand-primary transition-colors">Testimonials</a>
+                    <a href="#pricing" id="nav-link-5" class="text-gray-600 hover:text-brand-primary transition-colors">FAQs</a>
                 </div>
 
                 <!-- Nav CTA -->
-                <button onclick="scrollToForm()" class="hidden md:flex items-center gap-2 bg-black text-white px-6 py-2.5 rounded-md font-bold text-sm hover:bg-gray-800 transition-all duration-300 transform hover:-translate-y-0.5">
+                <button onclick="scrollToForm()" class="hidden md:flex items-center gap-2 btn-primary-img px-5 py-2 font-medium text-sm transition-all duration-300 transform hover:-translate-y-0.5">
                     Apply Now
                 </button>
 
                 <!-- Mobile Hamburger -->
-                <button onclick="scrollToForm()" class="md:hidden text-black p-2" id="mobile-menu-btn">
+                <button onclick="scrollToForm()" class="md:hidden text-brand-darker p-2" id="mobile-menu-btn">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
             </div>
@@ -265,343 +295,357 @@
     </nav>
 
     <!-- ================= DARK HERO SECTION ================= -->
-    <header class="relative pt-40 lg:pt-48 pb-10 overflow-hidden border-b border-white/5">
-         <video
-        autoplay
-        muted
-        loop
-        playsinline
-        preload="auto"
-        class="absolute inset-0 w-full h-full object-cover"
-    >
-        <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260302_085844_21a8f4b3-dea5-4ede-be16-d53f6973bb14.mp4" type="video/mp4">
-    </video>
+    <header class="relative pt-40 lg:pt-48 pb-10 overflow-hidden border-b border-gray-800 bg-brand-darker">
+        <video
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            class="absolute inset-0 w-full h-full object-cover opacity-100"
+        >
+            <source src="https://stream.mux.com/kimF2ha9zLrX64H00UgLGPflCzNtl1T0215MlAmeOztv8.m3u8" type="video/mp4">
+        </video>
 
-    <!-- Dark Overlay -->
-    <div class="absolute inset-0 bg-black/25"></div>
+        <!-- Ambient Glow Blob -->
+        <div class="absolute top-0 right-1/4 w-96 h-96 bg-brand-primary/20 rounded-full mix-blend-screen filter blur-[100px] animate-blob z-0"></div>
+
+        <!-- Dark Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-darker/80 via-brand-darker/60 to-brand-darker"></div>
+        
         <div class="container mx-auto px-6 lg:px-12 relative z-10">
             <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-12">
                 
-                <!-- Left Column: Content exactly matching image style -->
-                <div class="lg:w-[55%] w-full text-center lg:text-left">
+                <!-- Left Column -->
+                <div class="lg:w-[55%] w-full text-center lg:text-left reveal-left">
                     
                     <!-- Pill Badge -->
-                    <div class="inline-flex items-center gap-3 pr-4 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-sm">
-                        <span class="px-4 py-1.5 text-xs font-semibold bg-brand-light text-black rounded-full">New</span>
-                        <span class="text-xs font-medium text-gray-50">Registrations are now open!</span>
+                    <div class="inline-flex items-center gap-3 pr-4 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-sm shadow-inner-light">
+                        <span class="px-4 py-1.5 text-xs font-bold bg-brand-primary text-white rounded-full uppercase tracking-wider">New</span>
+                        <span class="text-xs font-medium text-gray-200">Registrations are now open for 2026!</span>
                     </div>
                     
                     <!-- Main Typography -->
-                    <h1 class="text-4xl lg:text-7xl font-bold text-white leading-[1.1] mb-6 tracking-tight">
+                    <h1 class="text-4xl lg:text-7xl font-extrabold text-white leading-[1.1] mb-6 tracking-tight">
                         Master Digital <br />
                         Marketing From <br />
-                        Scratch
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-primary to-orange-300">Scratch</span>
                     </h1>
                     
-                    <p class="text-md text-gray-50 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                    <p class="text-lg text-gray-300 mb-10 leading-relaxed max-w-xl mx-auto lg:mx-0">
                         The only digital marketing course you need to be among the top 1% marketers. 180 Hours Training + 6 Months Guaranteed Internship.
                     </p>
 
                     <!-- Buttons Row -->
                     <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-12">
-                        <button onclick="scrollToForm()" class="group w-full sm:w-auto bg-white hover:bg-gray-100 text-black px-8 py-3.5 rounded-lg font-semibold flex items-center justify-center gap-3 transition-colors text-sm">
-                            Enroll Now <i class="fa-solid fa-arrow-right text-xs group-hover:-rotate-45 transition-all duration-500"></i>
+                        <button onclick="scrollToForm()" class="btn-primary-img group w-full sm:w-auto px-6 py-2.5 font-medium flex items-center justify-center gap-2 transition-all duration-300 text-sm">
+                            Enroll Now <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform duration-300"></i>
                         </button>
-                        <a href="#curriculum" class="group w-full flex gap-2 sm:w-auto  text-white px-8 py-3.5 rounded-lg font-semibold flex items-center justify-center transition-colors text-sm">
-                            See Curriculum <i class="fa-solid fa-arrow-right text-xs group-hover:rotate-45 transition-all duration-500"></i>
+                        <a href="#curriculum" class="btn-secondary-img group w-full sm:w-auto px-6 py-2.5 font-medium flex items-center justify-center gap-2 transition-all duration-300 text-sm">
+                            See Curriculum <i class="fa-solid fa-arrow-down text-xs group-hover:translate-y-1 transition-transform duration-300"></i>
                         </a>
                     </div>
 
                     <!-- Features Row with Icons -->
-                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-2 text-xs font-semibold text-gray-300 tracking-wide uppercase">
-                        <span class="flex items-center gap-2 border border-gray-400 px-3 py-1 rounded-md bg-white/5 border border-white/10 backdrop-blur-sm">
-                            <i class="fa-solid fa-video text-gray-300"></i> + <i class="fa-solid fa-user text-white"></i> HYBRID
+                    <div class="flex flex-wrap items-center justify-center lg:justify-start gap-3 text-xs font-semibold text-gray-300 tracking-wide uppercase">
+                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 backdrop-blur-sm">
+                            <i class="fa-solid fa-video text-brand-primary"></i> + <i class="fa-solid fa-user text-gray-400"></i> HYBRID
                         </span>
-                        <span class="flex items-center gap-2 border border-gray-400 px-3 py-1 rounded-md bg-white/5 border border-white/10  backdrop-blur-sm">
-                            <i class="fa-solid fa-square-check text-white"></i> HANDS-ON
+                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 backdrop-blur-sm">
+                            <i class="fa-solid fa-square-check text-brand-primary"></i> HANDS-ON
                         </span>
-                        <span class="flex items-center gap-2 border border-gray-400 px-3 py-1 rounded-md bg-white/5 border border-white/10  backdrop-blur-sm">
-                            <i class="fa-solid fa-award text-white"></i> CERTIFICATE
-                        </span>
-                        <span class="flex items-center gap-2 border border-gray-400 px-3 py-1 rounded-md bg-white/5 border border-white/10  backdrop-blur-sm">
-                            <i class="fa-solid fa-robot text-white"></i> AI READY
+                        <span class="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/50 border border-gray-700 backdrop-blur-sm">
+                            <i class="fa-solid fa-award text-brand-primary"></i> CERTIFICATE
                         </span>
                     </div>
                 </div>
 
-                <!-- Right Column: Dark Theme Lead Form replacing Image Cards -->
-                <div class="lg:w-[45%] w-full max-w-md mx-auto relative z-20" id="top-lead-form">
+                <!-- Right Column: Lead Form -->
+                <div class="lg:w-[45%] w-full max-w-md mx-auto relative z-20 reveal-right delay-200" id="top-lead-form">
                     
                     <!-- Form Card -->
-                    <div class="bg-white rounded-2xl p-8 lg:p-10 shadow-2xl relative border border-white/10">
+                    <div class="bg-white rounded-2xl p-8 lg:p-10 shadow-2xl relative border-t-4 border-brand-primary">
                         
                         <div class="mb-8">
-                            <h3 class="text-2xl font-bold text-black mb-2">Start Your Journey</h3>
-                            <p class="text-gray-700 text-sm">Download the 2026 syllabus and get a free career consultation today.</p>
+                            <h3 class="text-2xl font-bold text-brand-darker mb-2">Start Your Journey</h3>
+                            <p class="text-gray-500 text-sm">Download the 2026 syllabus and get a free career consultation today.</p>
                         </div>
 
                         <form id="mainForm" onsubmit="event.preventDefault(); alert('Form submitted! You are on your way to becoming a job-ready digital marketer.');" class="space-y-4">
                             
                             <div class="dark-input-floating">
-                                <input type="text" id="fullName" placeholder=" " required>
+                                <input type="text" id="fullName" placeholder=" " required class="border-gray-200 focus:border-brand-primary bg-gray-50 text-brand-darker">
                                 <label for="fullName">Full Name</label>
                             </div>
 
                             <div class="dark-input-floating">
-                                <input type="email" id="email" placeholder=" " required>
+                                <input type="email" id="email" placeholder=" " required class="border-gray-200 focus:border-brand-primary bg-gray-50 text-brand-darker">
                                 <label for="email">Email Address</label>
                             </div>
 
                             <div class="dark-input-floating">
-                                <input type="tel" id="phone" placeholder=" " required>
+                                <input type="tel" id="phone" placeholder=" " required class="border-gray-200 focus:border-brand-primary bg-gray-50 text-brand-darker">
                                 <label for="phone">Phone Number</label>
                             </div>
 
                             <div class="dark-input-floating">
-                                <select id="experience" required class="appearance-none cursor-pointer bg-black">
+                                <select id="experience" required class="appearance-none cursor-pointer border-gray-200 bg-gray-50 text-brand-darker focus:border-brand-primary">
                                     <option value="" disabled selected></option>
                                     <option value="student">Student / Fresher</option>
                                     <option value="professional">Working Professional</option>
                                     <option value="business">Business Owner</option>
                                 </select>
                                 <label for="experience">Current Profile</label>
-                                <!-- Custom Dropdown Arrow -->
                                 <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-500">
                                     <i class="fa-solid fa-chevron-down text-sm"></i>
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full mt-6 bg-black text-white font-semibold text-base py-4 rounded-lg hover:bg-gray-900 transition-all duration-300 ">
+                            <button type="submit" class="w-full mt-6 bg-brand-darker text-white font-semibold text-base py-4 rounded-xl hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5">
                                 Download Brochure
                             </button>
 
-                            <p class="text-xs text-center text-gray-500 mt-4 flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-lock text-[10px]"></i> Your information is 100% secure.
+                            <p class="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1.5 font-medium">
+                                <i class="fa-solid fa-shield-halved text-brand-primary"></i> Your information is 100% secure.
                             </p>
                         </form>
                     </div>
-
                 </div>
 
             </div>
         </div>
 
         <!-- ================= 12 TOOLS LEFT-TO-RIGHT MARQUEE ================= -->
-        <!-- Placed inside the dark header for aesthetic flow -->
-        <div class="mt-24 pb-12 w-full overflow-hidden marquee-container relative border-t border-white/5 pt-12">
-            <!-- Fade edges -->
+        <div class="mt-24 pb-12 w-full overflow-hidden marquee-container relative border-t border-gray-800 pt-12 reveal">
+            <p class="px-6 text-xs text-center font-bold tracking-[0.2em] text-brand-primary uppercase mb-8 ml-6">Featured Tools & Platforms</p>
             
-            <p class=" px-6 text-xs text-center font-semibold tracking-[0.2em] text-gray-50 uppercase mb-8 ml-6">FEATURED TOOLS & PLATFORMS</p>
-            
-            <!-- Left to Right Scrolling wrapper -->
-            <div class="marquee-ltr">
-                <!-- Group 1 (12 Tools) -->
+            <div class="marquee-ltr opacity-80">
+                <!-- Group 1 -->
                 <div class="flex items-center justify-around w-1/2 px-4 gap-12">
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-google text-2xl"></i>Ads</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-meta text-2xl"></i> Meta</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-whatsapp text-2xl"></i> WhatsApp</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-chart-pie text-2xl"></i> GA4</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-hubspot text-2xl"></i> HubSpot</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-mailchimp text-2xl"></i> Mailchimp</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-palette text-2xl"></i> Canva</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart text-2xl"></i> Semrush</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-elementor text-2xl"></i> Elementor</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-video text-2xl"></i> CapCut</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-robot text-2xl"></i> ChatGPT</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-wordpress text-2xl"></i> WordPress</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-google text-3xl"></i>Ads</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-meta text-3xl"></i> Meta</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-whatsapp text-3xl"></i> WhatsApp</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-chart-pie text-3xl"></i> GA4</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-hubspot text-3xl"></i> HubSpot</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-mailchimp text-3xl"></i> Mailchimp</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-palette text-3xl"></i> Canva</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart text-3xl"></i> Semrush</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-elementor text-3xl"></i> Elementor</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-video text-3xl"></i> CapCut</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-robot text-3xl"></i> ChatGPT</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-wordpress text-3xl"></i> WordPress</div>
                 </div>
-                <!-- Group 2 (Duplicate for seamless loop) -->
+                <!-- Group 2 (Duplicate) -->
                 <div class="flex items-center justify-around w-1/2 px-4 gap-12">
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-google text-2xl"></i> Ads</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-meta text-2xl"></i> Meta</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-whatsapp text-2xl"></i> WhatsApp</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-chart-pie text-2xl"></i> GA4</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-hubspot text-2xl"></i> HubSpot</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-mailchimp text-2xl"></i> Mailchimp</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-palette text-2xl"></i> Canva</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart text-2xl"></i> Semrush</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-elementor text-2xl"></i> Elementor</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-video text-2xl"></i> CapCut</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-solid fa-robot text-2xl"></i> ChatGPT</div>
-                    <div class="flex items-center gap-2 font-bold text-xl text-gray-50 hover:text-white transition-colors"><i class="fa-brands fa-wordpress text-2xl"></i> WordPress</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-google text-3xl"></i>Ads</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-meta text-3xl"></i> Meta</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-whatsapp text-3xl"></i> WhatsApp</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-chart-pie text-3xl"></i> GA4</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-hubspot text-3xl"></i> HubSpot</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-mailchimp text-3xl"></i> Mailchimp</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-palette text-3xl"></i> Canva</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass-chart text-3xl"></i> Semrush</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-elementor text-3xl"></i> Elementor</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-video text-3xl"></i> CapCut</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-solid fa-robot text-3xl"></i> ChatGPT</div>
+                    <div class="flex items-center gap-3 font-bold text-xl text-gray-400 hover:text-white transition-colors"><i class="fa-brands fa-wordpress text-3xl"></i> WordPress</div>
                 </div>
             </div>
         </div>
     </header>
-    <section id="stats-section" class="pt-16 bg-white flex justify-center">
-  <div class="max-w-[1400px] w-full px-4 sm:px-6 lg:px-0">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6">
-      
-      <div class="bg-[#FAFAFA] rounded-2xl py-12 px-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] duration-300">
-        <h2 class="text-5xl md:text-[3.5rem] font-serif-custom text-[#1A1A1A] mb-3 font-medium tracking-tight">
-          <span class="counter" data-target="180">0</span>
-        </h2>
-        <p class="text-[11px] text-[#000] tracking-[0.15em] uppercase font-medium max-w-[160px] leading-relaxed">
-          Training Hours
-        </p>
-      </div>
 
-      <div class="bg-[#FAFAFA] rounded-2xl py-12 px-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] duration-300">
-        <h2 class="text-5xl md:text-[3.5rem] font-serif-custom text-[#1A1A1A] mb-3 font-medium tracking-tight">
-          <span class="counter" data-target="12">0</span>
-        </h2>
-        <p class="text-[11px] text-[#000] tracking-[0.15em] uppercase font-medium max-w-[160px] leading-relaxed">
-          Modules
-        </p>
-      </div>
+    <!-- Stats Section -->
+    <section id="stats-section" class="pt-0 pb-0 bg-orange-400 flex justify-center relative z-20 shadow-[0_-20px_40px_rgba(0,0,0,0.05)]">
+        <div class="max-w-[1400px] w-full px-4 sm:px-6 lg:px-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-0">
+                
+                <div class=" rounded-xl py-12 px-6 flex flex-col items-center justify-center text-center transition-all hover:scale-105 duration-300  group reveal-scale delay-100">
+                    <h2 class="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight transition-colors">
+                        <span class="counter" data-target="180">0</span>
+                    </h2>
+                    <p class="text-[11px] text-gray-50 tracking-[0.2em] uppercase font-bold max-w-[160px] leading-relaxed">
+                        Training Hours
+                    </p>
+                </div>
 
-      <div class="bg-[#FAFAFA] rounded-2xl py-12 px-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] duration-300">
-        <h2 class="text-5xl md:text-[3.5rem] font-serif-custom text-[#1A1A1A] mb-3 font-medium tracking-tight">
-          <span class="counter" data-target="12">0</span>+
-        </h2>
-        <p class="text-[11px] text-[#000] tracking-[0.15em] uppercase font-medium max-w-[160px] leading-relaxed">
-          Tools Mastered
-        </p>
-      </div>
-<div class="bg-[#FAFAFA] rounded-2xl py-12 px-6 flex flex-col items-center justify-center text-center transition-transform hover:scale-[1.02] duration-300">
-        <h2 class="text-5xl md:text-[3.5rem] font-serif-custom text-[#1A1A1A] mb-3 font-medium tracking-tight">
-          <span class="counter" data-target="100">100</span>+
-        </h2>
-        <p class="text-[11px] text-[#000] tracking-[0.15em] uppercase font-medium max-w-[160px] leading-relaxed">
-          Student Placed
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-<section class=" py-24 px-4 md:px-8 text-[#1A1A1A] bg-white">
-  <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12 items-center">
+                <div class="  py-12 px-6 flex flex-col items-center justify-center text-center transition-all hover:scale-105  group reveal-scale delay-200">
+                    <h2 class="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight  transition-colors">
+                        <span class="counter" data-target="12">0</span>
+                    </h2>
+                    <p class="text-[11px] text-gray-50 tracking-[0.2em] uppercase font-bold max-w-[160px] leading-relaxed">
+                        Modules
+                    </p>
+                </div>
 
-    <div class="space-y-8">
-      <h1 class="text-4xl md:text-[2.15rem] font-bold leading-[1.1] tracking-tight">
-        Become a Job-Ready Digital Marketer in 12 Months
-      </h1>
-
-      <div class="flex flex-wrap gap-4">
-        <a href="#" class="bg-black hover:bg-gray-900 text-white px-5 py-2.5 rounded-md font-medium flex items-center transition-colors text-sm">
-          Enroll Now
-          <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-        </a>
-        <a href="#" class="bg-white hover:bg-gray-50 border border-gray-200 text-black px-5 py-2.5 rounded-md font-medium shadow-[0_1px_2px_rgba(0,0,0,0.05)] transition-colors text-sm">
-          See Curriculum
-        </a>
-      </div>
-
-      <ul class="space-y-5 text-[15px] text-gray-700 leading-relaxed">
-        <li class="flex items-start">
-          <svg class="w-5 h-5 text-black mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-          <span>180 Hours Classroom Training with a comprehensive AI-First Curriculum.</span>
-        </li>
-        <li class="flex items-start">
-          <svg class="w-5 h-5 text-black mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-          <span>Master 12+ industry tools including Meta Advantage+, Performance Max, and GA4.</span>
-        </li>
-        <li class="flex items-start">
-          <svg class="w-5 h-5 text-black mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-          <span>Develop skills across 12 modules including SEO, Performance Ads, and Automation.</span>
-        </li>
-        <li class="flex items-start">
-          <svg class="w-5 h-5 text-black mr-3 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-          <span>Get expert feedback during a 6-month structured internship with real clients.</span>
-        </li>
-      </ul>
-    </div>
-
-    <div class="relative w-full h-[550px] rounded-2xl overflow-hidden order-first lg:order-none mb-8 lg:mb-0">
-      <img src="girl.png" alt="Student engaging with digital marketing material" class="w-full h-full object-cover" />
-    </div>
-
-    <div class="space-y-10">
-      
-      <div>
-        <div class="w-8 h-8 rounded-full bg-[#000] text-white flex items-center justify-center mb-3">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <div class=" py-12 px-6 flex flex-col items-center justify-center text-center transition-all hover:scale-105  group reveal-scale delay-300">
+                    <h2 class="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight  transition-colors">
+                        <span class="counter" data-target="12">0</span>+
+                    </h2>
+                    <p class="text-[11px] text-gray-50 tracking-[0.2em] uppercase font-bold max-w-[160px] leading-relaxed">
+                        Tools Mastered
+                    </p>
+                </div>
+                
+                <div class=" py-12 px-6 flex flex-col items-center justify-center text-center transition-all hover:scale-105  group reveal-scale delay-100">
+                    <h2 class="text-5xl md:text-6xl font-bold text-white mb-3 tracking-tight  transition-colors">
+                        <span class="counter" data-target="100">0</span>%
+                    </h2>
+                    <p class="text-[11px] text-gray-50 tracking-[0.2em] uppercase font-bold max-w-[160px] leading-relaxed">
+                        Placement Assist
+                    </p>
+                </div>
+            </div>
         </div>
-        <h3 class="text-[1.15rem] font-bold mb-2">AI-First Curriculum</h3>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Every module reflects what actually works right now—built for the AI era, privacy-first advertising, and the Indian digital market.
-        </p>
-      </div>
+    </section>
 
-      <div>
-        <div class="w-8 h-8 rounded-full bg-[#000] text-white flex items-center justify-center mb-3">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v6.5"></path></svg>
+    <!-- Intro Section -->
+    <section class="py-24 px-4 md:px-8 text-brand-darker bg-white">
+        <div class="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-16 items-center">
+
+            <div class="space-y-8 reveal-left">
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-[1.1] tracking-tight text-brand-darker">
+                    Become a Job-Ready Digital Marketer in 12 Months
+                </h1>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="#" onclick="scrollToForm()" class="btn-primary-img px-6 py-2.5 font-medium flex items-center transition-all duration-300 text-sm hover:-translate-y-0.5">
+                        Enroll Now
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                    <a href="#curriculum" class="btn-secondary-img px-6 py-2.5 font-medium flex items-center transition-all duration-300 text-sm hover:-translate-y-0.5">
+                        See Curriculum
+                    </a>
+                </div>
+
+                <ul class="space-y-5 text-[16px] text-gray-600 font-medium leading-relaxed">
+                    <li class="flex items-start group">
+                        <div class="w-6 h-6 rounded-full px-2 bg-brand-accent flex items-center justify-center mr-4 mt-0.5 group-hover:bg-brand-primary transition-colors">
+                            <svg class="w-3.5 h-3.5 text-brand-primary group-hover:text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <span>180 Hours Classroom Training with a comprehensive AI-First Curriculum.</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <div class="w-6 h-6 rounded-full px-2 bg-brand-accent flex items-center justify-center mr-4 mt-0.5 group-hover:bg-brand-primary transition-colors">
+                            <svg class="w-3.5 h-3.5 text-brand-primary group-hover:text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <span>Master 12+ industry tools including Meta Advantage+, Performance Max, and GA4.</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <div class="w-6 h-6 rounded-full px-2 bg-brand-accent flex items-center justify-center mr-4 mt-0.5 group-hover:bg-brand-primary transition-colors">
+                            <svg class="w-3.5 h-3.5 text-brand-primary group-hover:text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <span>Develop skills across 12 modules including SEO, Performance Ads, and Automation.</span>
+                    </li>
+                    <li class="flex items-start group">
+                        <div class="w-6 h-6 rounded-full px-2 bg-brand-accent flex items-center justify-center mr-4 mt-0.5 group-hover:bg-brand-primary transition-colors">
+                            <svg class="w-3.5 h-3.5 text-brand-primary group-hover:text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <span>Get expert feedback during a 6-month structured internship with real clients.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="relative w-full h-[550px] rounded-[2rem] overflow-hidden order-first lg:order-none mb-8 lg:mb-0 reveal shadow-2xl border border-gray-100">
+                <div class="absolute inset-0 bg-brand-primary/10 mix-blend-multiply z-10 pointer-events-none"></div>
+                <img src="girl.png" alt="Student engaging with digital marketing material" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
+            </div>
+
+            <div class="space-y-10 reveal-right">
+                
+                <div class="group hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-brand-accent text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-brand-darker">AI-First Curriculum</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Every module reflects what actually works right now—built for the AI era, privacy-first advertising, and the Indian digital market.
+                    </p>
+                </div>
+
+                <div class="group hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-brand-accent text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14v6.5"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-brand-darker">Real Hands-on Projects</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Apply your knowledge on real businesses and client projects under supervision, finishing with a guaranteed end-to-end portfolio.
+                    </p>
+                </div>
+
+                <div class="group hover:-translate-y-1 transition-transform duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-brand-accent text-brand-primary flex items-center justify-center mb-4 group-hover:bg-brand-primary group-hover:text-white transition-colors shadow-sm">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-brand-darker">Dedicated Mentorship</h3>
+                    <p class="text-gray-500 text-sm leading-relaxed">
+                        Receive personalized guidance through weekly team standups and dedicated mentor review sessions to evaluate your live campaigns.
+                    </p>
+                </div>
+
+            </div>
         </div>
-        <h3 class="text-[1.15rem] font-bold mb-2">Real Hands-on Projects</h3>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Apply your knowledge on real businesses and client projects under supervision, finishing with a guaranteed end-to-end portfolio.
-        </p>
-      </div>
+    </section>
 
-      <div>
-        <div class="w-8 h-8 rounded-full bg-[#000] text-white flex items-center justify-center mb-3">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-        </div>
-        <h3 class="text-[1.15rem] font-bold mb-2">Dedicated Mentorship</h3>
-        <p class="text-gray-600 text-sm leading-relaxed">
-          Receive personalized guidance through weekly team standups and dedicated mentor review sessions to evaluate your live campaigns.
-        </p>
-      </div>
-
-    </div>
-  </div>
-</section>
     <!-- ================= FEATURES / WHY CHOOSE US ================= -->
-    <section id="features" class="py-8 sm:py-12 relative z-10 bg-white">
-        <div class="container mx-auto px-6 lg:px-12">
+    <section id="features" class="py-16 sm:py-24 relative z-10 bg-brand-light">
+        <div class="container mx-auto px-6 lg:px-12 max-w-[1400px]">
             
-            <div class="max-w-2xl mb-16 reveal">
-                <h5 class="text-gray-600 font-bold tracking-widest text-xs mb-4 uppercase">Why Choose Us?</h5>
-                <h2 class="text-3xl lg:text-5xl font-bold text-brand-dark leading-tight">
+            <div class="max-w-2xl mb-20 reveal">
+                <h5 class="text-brand-primary font-bold tracking-widest text-sm mb-4 uppercase">Why Choose Us?</h5>
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-brand-darker leading-tight">
                     Explore Our Career-Focused Approach
                 </h2>
             </div>
 
-            <!-- Feature 1: AI First (Left Text, Right Graphic) -->
-            <div class="flex flex-col lg:flex-row items-center gap-16 mb-16 reveal">
+            <!-- Feature 1: AI First -->
+            <div class="flex flex-col lg:flex-row items-center gap-16 mb-24 reveal-left">
                 <div class="lg:w-1/2">
-                    <div class="w-12 h-12 rounded-lg bg-black/10 flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-wand-magic-sparkles text-xl text-black"></i>
+                    <div class="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-2xl text-brand-primary"></i>
                     </div>
-                    <h3 class="text-xl sm:text-2xl font-bold text-brand-dark mb-4">AI-First Curriculum</h3>
-                    <p class="text-gray-800 leading-relaxed mb-8 text-md">
-                        This is not a recycled 2020 course. We weave GEO/AI Overviews SEO, prompt engineering, AI agents, and creative AI tools into every single module—not bolted on as an afterthought. By integrating these next-generation skills from day one, you will learn to execute complex campaigns faster and with unprecedented precision.</p>
-                        <p class="text-gray-800 leading-relaxed mb-8 text-md"> We also tackle the realities of a privacy-first, cookieless web head-on, ensuring your tracking and analytics strategies are completely future-proof. This holistic approach transforms you from a standard marketer into a highly adaptable, tech-fluent strategist.
+                    <h3 class="text-3xl font-bold text-brand-darker mb-6">AI-First Curriculum</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6 text-md">
+                        This is not a recycled 2020 course. We weave GEO/AI Overviews SEO, prompt engineering, AI agents, and creative AI tools into every single module—not bolted on as an afterthought. By integrating these next-generation skills from day one, you will learn to execute complex campaigns faster and with unprecedented precision.
                     </p>
-                    <button onclick="scrollToForm()" class="text-white px-4 py-3.5 bg-black font-semibold rounded-md flex items-center gap-2 hover:text-white transition group">
+                    <p class="text-gray-600 leading-relaxed mb-8 text-md"> 
+                        We also tackle the realities of a privacy-first, cookieless web head-on, ensuring your tracking and analytics strategies are completely future-proof.
+                    </p>
+                    <button onclick="scrollToForm()" class="flex items-center gap-2 btn-primary-img px-5 py-3 font-medium text-sm transition-all duration-300 transform hover:-translate-y-0.5">
                         Apply for 2026 Batch
-                        
                     </button>
                 </div>
                 <div class="lg:w-1/2 relative w-full">
-                    <!-- Custom UI Graphic replacing image -->
-                    <div class="w-full bg-[#f0edff] rounded-2xl text-white relative shadow-lg overflow-hidden aspect-square lg:aspect-auto lg:h-[440px]">
-    <img src="ai.png" alt="ai tools" class="w-full h-full object-cover"/>
-</div>
+                    <div class="w-full bg-gradient-to-br from-brand-accent to-orange-50 rounded-3xl text-white relative shadow-2xl border border-orange-100 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
+                        <div class="absolute inset-0 bg-brand-primary mix-blend-overlay opacity-20 group-hover:opacity-10 transition-opacity duration-500"></div>
+                        <img src="ai.png" alt="AI Technology" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                    </div>
                 </div>
             </div>
 
-            <!-- Feature 2: WhatsApp & India Market (Right Text, Left Graphic) -->
-            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 mb-24 reveal">
+            <!-- Feature 2: WhatsApp & India Market -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 reveal-right">
                 <div class="lg:w-1/2">
-                    <div class="w-12 h-12 rounded-lg bg-black/10 flex items-center justify-center mb-8">
-                        <i class="fa-solid fa-wand-magic-sparkles text-xl text-black"></i>
+                    <div class="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
+                        <i class="fa-brands fa-whatsapp text-3xl text-brand-primary"></i>
                     </div>
-                    <h3 class="text-xl sm:text-2xl font-bold text-brand-dark mb-4">WhatsApp-First India Market</h3>
-                    <p class="text-gray-800 leading-relaxed mb-8 text-md">
-                        Learn WhatsApp Business API, broadcast automation, and CRM integration skills specifically tuned for the high-conversion Indian digital market.  You will build automated lead-nurturing sequences and construct 5-email drip workflows to capture and convert prospects effectively.</p>
-                        <p class="text-gray-800 leading-relaxed mb-8 text-md"> By mastering these tools, you can significantly enhance customer engagement and streamline communication pipelines for any business.
+                    <h3 class="text-3xl font-bold text-brand-darker mb-6">WhatsApp-First India Market</h3>
+                    <p class="text-gray-600 leading-relaxed mb-6 text-lg">
+                        Learn WhatsApp Business API, broadcast automation, and CRM integration skills specifically tuned for the high-conversion Indian digital market. You will build automated lead-nurturing sequences and construct 5-email drip workflows to capture and convert prospects effectively.
                     </p>
-                    <ul class="space-y-3 mb-8">
-                        <li class="flex items-center gap-3 font-semibold text-brand-dark"><div class="w-6 h-6 rounded-full bg-[#000]/10 flex items-center justify-center"><i class="fa-solid fa-check text-[10px] text-[#000]"></i></div> Automation Workflows</li>
-                        <li class="flex items-center gap-3 font-semibold text-brand-dark"><div class="w-6 h-6 rounded-full bg-[#000]/10 flex items-center justify-center"><i class="fa-solid fa-check text-[10px] text-[#000]"></i></div> Drip Sequences</li>
-                        <li class="flex items-center gap-3 font-semibold text-brand-dark"><div class="w-6 h-6 rounded-full bg-[#000]/10 flex items-center justify-center"><i class="fa-solid fa-check text-[10px] text-[#000]"></i></div> HubSpot / Zoho Pipelines</li>
+                    <p class="text-gray-600 leading-relaxed mb-8 text-lg"> 
+                        By mastering these tools, you can significantly enhance customer engagement and streamline communication pipelines for any business.
+                    </p>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-4 font-semibold text-brand-darker text-lg"><div class="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center"><i class="fa-solid fa-check text-sm text-brand-primary"></i></div> Automation Workflows</li>
+                        <li class="flex items-center gap-4 font-semibold text-brand-darker text-lg"><div class="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center"><i class="fa-solid fa-check text-sm text-brand-primary"></i></div> Drip Sequences</li>
+                        <li class="flex items-center gap-4 font-semibold text-brand-darker text-lg"><div class="w-8 h-8 rounded-full bg-brand-primary/20 flex items-center justify-center"><i class="fa-solid fa-check text-sm text-brand-primary"></i></div> HubSpot / Zoho Pipelines</li>
                     </ul>
                 </div>
                 <div class="lg:w-1/2 relative w-full">
-                   <div class="w-full bg-[#f0edff] rounded-2xl text-white relative shadow-lg overflow-hidden aspect-square lg:aspect-auto lg:h-[440px]">
-    <img src="wau.png" alt="ai tools" class="w-full h-full object-cover"/>
-</div>
+                   <div class="w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl text-white relative shadow-2xl border border-gray-200 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
+                        <div class="absolute inset-0 bg-brand-dark mix-blend-overlay opacity-30 group-hover:opacity-10 transition-opacity duration-500"></div>
+                        <img src="wau.png" alt="Social Media Analytics" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
+                    </div>
                 </div>
             </div>
 
@@ -609,40 +653,42 @@
     </section>
 
     <!-- ================= MASSIVE CURRICULUM ACCORDION (12 MODULES) ================= -->
-    <section id="curriculum" class="py-24 bg-white relative overflow-hidden border-t border-gray-200">
-        
-        <div class="container mx-auto px-6 lg:px-12 relative z-10">
+    <section id="curriculum" class="py-24 bg-white relative overflow-hidden border-t border-gray-100">
+        <div class="container mx-auto px-6 lg:px-12 relative z-10 max-w-[1400px]">
             
             <div class="text-left sm:text-center max-w-3xl mx-auto mb-20 reveal">
-                <h5 class="text-gray-600 font-bold tracking-widest text-xs mb-4 uppercase">180 Hours • 12 Modules</h5>
-                <h2 class="text-4xl lg:text-5xl font-bold text-brand-dark mb-6">Detailed Phase 1 Curriculum</h2>
-                <p class="text-gray-800 text-lg">Six months of intensive, hands-on training structured into progressive modules. Every module ends with a real portfolio deliverable.</p>
+                <h5 class="text-brand-primary font-bold tracking-widest text-sm mb-4 uppercase">180 Hours • 12 Modules</h5>
+                <h2 class="text-4xl lg:text-5xl font-extrabold text-brand-darker mb-6">Detailed Phase 1 Curriculum</h2>
+                <p class="text-gray-600 text-lg">Six months of intensive, hands-on training structured into progressive modules. Every module ends with a real portfolio deliverable.</p>
             </div>
 
-            <!-- The 12 Modules Grid List -->
-            <div class="max-w-[1400px] mx-auto space-y-4">
+            <!-- The Modules Grid List -->
+            <div class="max-w-7xl mx-auto space-y-4">
 
                 <!-- Module 1 -->
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow reveal">
+                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
                     <input type="checkbox" id="mod1" class="accordion-input hidden">
                     <label for="mod1" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
                         <div class="flex items-center gap-6">
-                            <span class="text-2xl font-bold text-gray-300 group-hover:text-gray-900 transition-colors">01</span>
-                            <span class="font-semibold text-xl text-brand-dark">Digital Marketing Foundation</span>
+                            <span class="number-indicator text-3xl font-extrabold text-gray-200 group-hover:text-gray-400 transition-colors">01</span>
+                            <span class="font-bold text-xl text-brand-darker">Digital Marketing Foundation</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-brand-accent group-hover:text-brand-primary transition-colors">
+                            <i class="fa-solid fa-plus text-sm"></i>
                         </div>
                     </label>
                     <div class="accordion-content">
                         <div class="px-6 pb-6 text-gray-600 text-sm">
-                            <div class="border-t border-gray-100 pt-4 mt-2">
-                                <ul class="space-y-3">
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 1.1:</strong> <span>Digital Marketing Ecosystem 2026. Traditional vs Digital. Career paths. AI-assisted buyer research & zero-click behaviour (2.5 hrs).</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 1.2:</strong> <span>Customer Journey Mapping. Marketing Funnels (TOFU-MOFU-BOFU). AIDA & modern non-linear journeys (2.5 hrs).</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 1.3:</strong> <span>Buyer Persona Creation (hands-on). Market & Competitor Research using SEMrush / SimilarWeb (2.5 hrs).</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 1.4:</strong> <span>Branding & Positioning. STP framework. Brand voice in the AI era (2.5 hrs).</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 1.5:</strong> <span>SOSTAC Marketing Planning Framework. Building a one-page marketing plan (2.0 hrs).</span></li>
+                            <div class="border-t border-brand-primary/10 pt-6 mt-2">
+                                <ul class="space-y-4">
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 1.1:</strong> <span>Digital Marketing Ecosystem 2026. Traditional vs Digital. Career paths. AI-assisted buyer research (2.5 hrs).</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 1.2:</strong> <span>Customer Journey Mapping. Marketing Funnels (TOFU-MOFU-BOFU). AIDA & modern non-linear journeys (2.5 hrs).</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 1.3:</strong> <span>Buyer Persona Creation. Market & Competitor Research using SEMrush / SimilarWeb (2.5 hrs).</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 1.4:</strong> <span>Branding & Positioning. STP framework. Brand voice in the AI era (2.5 hrs).</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 1.5:</strong> <span>SOSTAC Marketing Planning Framework. Building a one-page marketing plan (2.0 hrs).</span></li>
                                 </ul>
-                                <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 inline-block text-brand-dark">
-                                    <span class="font-bold">Deliverable:</span> Complete marketing plan document for a real business.
+                                <div class="mt-6 p-4 bg-brand-accent/50 rounded-xl border border-brand-primary/20 inline-block text-brand-darker">
+                                    <span class="font-bold text-brand-primary"><i class="fa-solid fa-bolt mr-2"></i>Deliverable:</span> Complete marketing plan document for a real business.
                                 </div>
                             </div>
                         </div>
@@ -650,829 +696,723 @@
                 </div>
 
                 <!-- Module 2 -->
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow reveal">
+                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale delay-100">
                     <input type="checkbox" id="mod2" class="accordion-input hidden">
                     <label for="mod2" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
                         <div class="flex items-center gap-6">
-                            <span class="text-2xl font-bold text-gray-300 group-hover:text-gray-900 transition-colors">02</span>
-                            <span class="font-semibold text-xl text-brand-dark">Website, CMS & Conversion Optimization</span>
+                            <span class="number-indicator text-3xl font-extrabold text-gray-200 group-hover:text-gray-400 transition-colors">02</span>
+                            <span class="font-bold text-xl text-brand-darker">Website, CMS & Conversion</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-brand-accent group-hover:text-brand-primary transition-colors">
+                            <i class="fa-solid fa-plus text-sm"></i>
                         </div>
                     </label>
                     <div class="accordion-content">
                         <div class="px-6 pb-6 text-gray-600 text-sm">
-                            <div class="border-t border-gray-100 pt-4 mt-2">
-                                <ul class="space-y-3">
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.1:</strong> <span>How the web works. Domain, Hosting, DNS, SSL. Architecture planning.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.2:</strong> <span>WordPress Installation & Setup (live lab). Themes, plugins, security basics.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.3:</strong> <span>Page builders (Elementor). Website structure & UI/UX fundamentals.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.4:</strong> <span>Landing Page Design Principles. Message match. Framer/Webflow awareness.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.5:</strong> <span>CRO Fundamentals. Forms, CTAs & Lead Capture. Heatmaps.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.6:</strong> <span>Chatbots & WhatsApp Integration. Website Speed & Core Web Vitals.</span></li>
-                                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 2.7:</strong> <span>Lab: Launch a live WordPress website + landing page.</span></li>
+                            <div class="border-t border-brand-primary/10 pt-6 mt-2">
+                                <ul class="space-y-4">
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 2.1:</strong> <span>How the web works. Domain, Hosting, DNS, SSL. Architecture planning.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 2.2:</strong> <span>WordPress Installation & Setup (live lab). Themes, plugins, security basics.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 2.3:</strong> <span>Page builders (Elementor). Website structure & UI/UX fundamentals.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 2.4:</strong> <span>Landing Page Design Principles. Message match. Framer/Webflow awareness.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 2.5:</strong> <span>CRO Fundamentals. Forms, CTAs & Lead Capture. Heatmaps.</span></li>
                                 </ul>
-                                <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 inline-block text-brand-dark">
-                                    <span class="font-bold">Deliverable:</span> Live student website with lead-capture landing page.
+                                <div class="mt-6 p-4 bg-brand-accent/50 rounded-xl border border-brand-primary/20 inline-block text-brand-darker">
+                                    <span class="font-bold text-brand-primary"><i class="fa-solid fa-bolt mr-2"></i>Deliverable:</span> Live student website with lead-capture landing page.
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Fast Forward Modules 3-12 Summary block to maintain visual pacing -->
-                <div class="grid md:grid-cols-2 gap-4 mt-8 reveal">
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">03. SEO + AI Search (24h)</h4>
+                <!-- Grid Summary for 3-10 -->
+                <div class="grid md:grid-cols-2 gap-4 mt-8 mb-8 reveal">
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">03. SEO + AI Search </h4>
                         <p class="text-gray-500 text-sm">Google AI Overviews, E-E-A-T, On-page, Off-page, Technical SEO.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">04. Performance Ads (28h)</h4>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">04. Performance Ads</h4>
                         <p class="text-gray-500 text-sm">Google Ads (PMax), Meta Advantage+, Tracking setup.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">05. Social & Influencer (16h)</h4>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">05. Social & Influencer </h4>
                         <p class="text-gray-500 text-sm">Growth: Reels strategy, LinkedIn B2B, UGC, Influencer contracts.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">06. Content & Copywriting (14h)</h4>
-                        <p class="text-gray-500 text-sm">Pillar models, Hook formulas, Copy psychology, Video script storyboarding.</p>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">06. Content & Copywriting </h4>
+                        <p class="text-gray-500 text-sm">Pillar models, Hook formulas, Copy psychology, Video scripts.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">07. Email & WhatsApp (12h)</h4>
-                        <p class="text-gray-500 text-sm">DMARC, HubSpot/Zoho pipelines, WhatsApp Business API automation flows.</p>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">07. Email & WhatsApp </h4>
+                        <p class="text-gray-500 text-sm">DMARC, HubSpot/Zoho pipelines, WhatsApp automation flows.</p>
                     </div>
-                    <div class="bg-white p-6 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 class="font-semibold text-brand-dark text-lg mb-2">08. Analytics & Data (16h)</h4>
-                        <p class="text-gray-500 text-sm">GA4 deep-dive, GTM, Server-side tracking concepts, Looker Studio dashboards.</p>
+                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                        <h4 class="font-bold text-brand-darker text-lg mb-2">08. Analytics & Data </h4>
+                        <p class="text-gray-500 text-sm">GA4 deep-dive, GTM, Server-side tracking, Looker Studio.</p>
                     </div>
-                    
                 </div>
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow reveal">
-    <input type="checkbox" id="mod11" class="accordion-input hidden">
-    <label for="mod11" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
-        <div class="flex items-center gap-6">
-            <span class="text-2xl font-bold text-gray-300 group-hover:text-gray-900 transition-colors">11</span>
-            <span class="font-semibold text-xl text-brand-dark">Capstone Live Project</span>
-        </div>
-    </label>
-    <div class="accordion-content">
-        <div class="px-6 pb-6 text-gray-600 text-sm">
-            <div class="border-t border-gray-100 pt-4 mt-2">
-                <ul class="space-y-3">
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 11.1:</strong> <span>Capstone briefing: each student/team assigned a real business. Discovery & audit (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 11.2:</strong> <span>Build: website/landing page + SEO setup + tracking installation (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 11.3:</strong> <span>Build: campaign structure (Google + Meta) + content calendar + automation funnel (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 11.4:</strong> <span>Execute & monitor. Mentor review sessions (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 11.5:</strong> <span>Final presentation: full strategy + results + reporting to panel (graded) (2.0 hrs).</span></li>
-                </ul>
-                <div class="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 inline-block text-brand-dark">
-                    <span class="font-bold">Deliverable:</span> Complete end-to-end marketing project — the centrepiece of the student portfolio.
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow reveal">
-    <input type="checkbox" id="mod12" class="accordion-input hidden">
-    <label for="mod12" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
-        <div class="flex items-center gap-6">
-            <span class="text-2xl font-bold text-gray-300 group-hover:text-gray-900 transition-colors">12</span>
-            <span class="font-semibold text-xl text-brand-dark">Career, Freelancing & Agency Setup</span>
-        </div>
-    </label>
-    <div class="accordion-content">
-        <div class="px-6 pb-6 text-gray-600 text-sm">
-            <div class="border-t border-gray-100 pt-4 mt-2">
-                <ul class="space-y-3">
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 12.1:</strong> <span>Resume & LinkedIn optimisation. Portfolio building. Interview preparation + mock interviews (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 12.2:</strong> <span>Freelancing: Upwork/Fiverr profile setup. Client pitching & proposal writing. Pricing models (2.5 hrs).</span></li>
-                    <li class="flex gap-4"><strong class="text-brand-dark whitespace-nowrap">Session 12.3:</strong> <span>Agency operations basics: services, retainers, client onboarding, tools stack (1.0 hr).</span></li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+                <!-- Module 11 -->
+                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
+                    <input type="checkbox" id="mod11" class="accordion-input hidden">
+                    <label for="mod11" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
+                        <div class="flex items-center gap-6">
+                            <span class="number-indicator text-3xl font-extrabold text-gray-200 group-hover:text-gray-400 transition-colors">11</span>
+                            <span class="font-bold text-xl text-brand-darker">Capstone Live Project</span>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-brand-accent group-hover:text-brand-primary transition-colors">
+                            <i class="fa-solid fa-plus text-sm"></i>
+                        </div>
+                    </label>
+                    <div class="accordion-content">
+                        <div class="px-6 pb-6 text-gray-600 text-sm">
+                            <div class="border-t border-brand-primary/10 pt-6 mt-2">
+                                <ul class="space-y-4">
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 11.1:</strong> <span>Capstone briefing: assigned a real business. Discovery & audit.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 11.2:</strong> <span>Build: website/landing page + SEO setup + tracking installation.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 11.3:</strong> <span>Build: campaign structure (Google + Meta) + automation funnel.</span></li>
+                                    <li class="flex gap-4"><strong class="text-brand-darker whitespace-nowrap">Session 11.4:</strong> <span>Execute & monitor. Mentor review sessions.</span></li>
+                                </ul>
+                                <div class="mt-6 p-4 bg-brand-accent/50 rounded-xl border border-brand-primary/20 inline-block text-brand-darker">
+                                    <span class="font-bold text-brand-primary"><i class="fa-solid fa-bolt mr-2"></i>Deliverable:</span> Complete end-to-end marketing project for portfolio.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
-            <div class="text-center mt-12">
-                 <button onclick="scrollToForm()" class="inline-flex items-center gap-2 bg-brand-dark text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-black transition-colors shadow-lg">
+            <div class="text-center mt-16 reveal">
+                 <button onclick="scrollToForm()" class="inline-flex items-center gap-3 bg-brand-darker text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-black transition-all shadow-xl hover:-translate-y-1">
                     Download Full 12-Month Brochure
                     <i class="fa-solid fa-download text-sm"></i>
                 </button>
             </div>
         </div>
     </section>
-<section class="bg-[#1862b8] overflow-hidden py-16 lg:py-0 lg:h-[400px] flex items-center relative w-full">
-  <div class="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-0 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-    
-    <div class="max-w-xl text-white">
-      <h2 class="text-3xl md:text-3xl font-bold leading-tight mb-5 max-w-sm tracking-tight">
-        Start Your Digital Marketing Journey Today!
-      </h2>
-      <p class="text-[16px] text-white leading-relaxed mb-8">
-        Join the next batch of aspiring marketers and gain the skills to run profitable campaigns, master AI tools, and drive real business growth. Don't wait—your marketing career starts here!
-      </p>
-      
-      <div class="flex flex-wrap items-center gap-4">
-        <button onclick="scrollToForm()" class="bg-white text-[#1A1A1A] text-[15px] font-semibold px-5 py-3 rounded-md flex items-center gap-3 hover:bg-gray-50 transition-colors shadow-sm">
-          Enroll Now
-          <span class="bg-black text-white rounded flex items-center justify-center w-6 h-6">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
-          </span>
-        </button>
-        
-      </div>
-    </div>
 
-    <div class="hidden lg:block relative w-full h-[400px]">
-      
-      <svg class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] text-white/10 pointer-events-none" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M50 400 C 150 450, 200 150, 300 250 S 450 50, 500 100" stroke="currentColor" stroke-width="4" stroke-linecap="round"/>
-        <path d="M0 250 C 100 200, 250 450, 350 250 S 450 -50, 550 50" stroke="currentColor" stroke-width="12" stroke-linecap="round"/>
-      </svg>
-
-      <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfaf8?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 1" class="absolute top-[10%] left-[5%] w-14 h-14 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 2" class="absolute top-[8%] left-[30%] w-20 h-20 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 3" class="absolute top-[12%] right-[20%] w-12 h-12 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 4" class="absolute top-[38%] left-[10%] w-16 h-16 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 5" class="absolute top-[35%] left-[40%] w-14 h-14 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=200&h=200&q=80" alt="Student 6" class="absolute top-[40%] right-[25%] w-28 h-28 rounded-full object-cover shadow-2xl border-4 border-[#6B46C1] z-10" />
-      
-      <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 7" class="absolute top-[25%] right-[5%] w-16 h-16 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 8" class="absolute bottom-[20%] left-[25%] w-20 h-20 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 9" class="absolute bottom-[10%] left-[60%] w-24 h-24 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-      
-      <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-4.0.3&auto=format&fit=facearea&facepad=2&w=150&h=150&q=80" alt="Student 10" class="absolute bottom-[15%] right-[10%] w-16 h-16 rounded-full object-cover shadow-xl border-2 border-[#6B46C1]" />
-
-    </div>
-  </div>
-</section>
-
-<section class="bg-white py-20 px-6 sm:px-10 lg:px-16">
-  <div class="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-16 relative">
-    
-    <div class="w-full lg:w-1/2 flex flex-col pb-[10vh]">
-      
-      <div class="mb-14">
-        <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-200 bg-white text-[13px] font-medium text-gray-700 mb-6 shadow-sm">
-          <span class="w-1 h-1 rounded-full bg-gray-700"></span> Features
-        </span>
-        <h2 class="text-4xl sm:text-5xl font-bold text-[#1A1A1A] tracking-tight mb-5 leading-[1.1]">
-          What makes this program 2026-Ready
-        </h2>
-        <p class="text-gray-800 text-[17px] leading-relaxed max-w-xl">
-          This curriculum is not a recycled course from 2020. Every module reflects what actually works right now built for the AI era, privacy-first advertising, and the Indian digital market.
-        </p>
-      </div>
-
-      <div class="flex flex-col relative">
-        
-        <div class="sticky top-[100px] bg-white rounded-[0.5rem] p-8 sm:p-10 border border-gray-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-4 transition-all">
-          <div class="mb-4 text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-          </div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold text-[#1A1A1A]">AI-First Throughout</h3>
-            <span class="text-lg font-medium text-gray-400">01</span>
-          </div>
-          <p class="text-gray-800 leading-relaxed text-[15px]">
-            GEO/AI Overviews SEO, prompt engineering, AI agents, AI creative tools - AI is woven into every module, not bolted on as an afterthought.
-          </p>
+    <!-- Blue/Gray Banner Section -->
+    <section class="bg-brand-darker overflow-hidden py-20 lg:py-0 lg:h-[450px] flex items-center relative w-full border-y border-gray-800">
+        <!-- Orange Decorative SVG blob -->
+        <div class="absolute top-0 left-0 w-full h-full overflow-hidden opacity-30 z-0">
+            <svg class="absolute w-[800px] h-[800px] text-brand-primary/20 -top-[200px] -left-[100px] animate-blob" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                <path fill="currentColor" d="M44.7,-76.4C58.8,-69.2,71.8,-59.1,81.3,-46.3C90.8,-33.5,96.8,-18.1,97.6,-2.4C98.4,13.3,94.1,29.3,84.4,42.5C74.7,55.7,59.7,66,43.7,73.1C27.7,80.2,10.7,84,-5.4,81.5C-21.5,79,-36.8,70.2,-50.2,59.6C-63.6,49,-75,36.5,-81.8,21.5C-88.6,6.5,-90.7,-11,-85,-26C-79.3,-41,-65.7,-53.4,-51.2,-61.2C-36.7,-69,-21.3,-72.1,-3.2,-67.6C14.9,-63.1,30.6,-83.6,44.7,-76.4Z" transform="translate(100 100)" />
+            </svg>
         </div>
 
-        <div class="sticky top-[120px] bg-white rounded-[0.8] p-8 sm:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-4 transition-all">
-          <div class="mb-4 text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-          </div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold text-[#1A1A1A]">Privacy-Era Tracking</h3>
-            <span class="text-lg font-medium text-gray-400">02</span>
-          </div>
-          <p class="text-gray-500 leading-relaxed text-[15px]">
-            GA4, Conversions API, Consent Mode v2, server-side concepts - learn how to track accurately in a cookieless world.
-          </p>
+        <div class="max-w-[1400px] mx-auto px-6 sm:px-10 lg:px-12 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+            
+            <div class="max-w-xl text-white reveal-left">
+                <h2 class="text-4xl md:text-5xl font-extrabold leading-tight mb-6 tracking-tight">
+                    Start Your Marketing Journey Today!
+                </h2>
+                <p class="text-lg text-gray-300 leading-relaxed mb-10">
+                    Join the next batch of aspiring marketers and gain the skills to run profitable campaigns, master AI tools, and drive real business growth.
+                </p>
+                
+                <div class="flex flex-wrap items-center gap-4">
+                    <button onclick="scrollToForm()" class="flex items-center gap-2 btn-primary-img px-5 py-2 font-medium text-sm transition-all duration-300 transform hover:-translate-y-0.5">
+                        Enroll Now
+                        <span class="bg-white/20 text-white rounded-full flex items-center justify-center w-8 h-8">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                        </span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="hidden lg:block relative w-full h-[400px] reveal-right">
+                <!-- Floating Avatars using gray and orange borders -->
+                <img src="https://images.unsplash.com/photo-1531123897727-8f129e1bfaf8?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 1" class="absolute top-[10%] left-[5%] w-16 h-16 rounded-full object-cover shadow-xl border-[3px] border-brand-primary animate-float" />
+                <img src="https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 2" class="absolute top-[8%] left-[30%] w-20 h-20 rounded-full object-cover shadow-xl border-[3px] border-brand-secondary animate-float-delayed" />
+                <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 3" class="absolute top-[12%] right-[20%] w-14 h-14 rounded-full object-cover shadow-xl border-[3px] border-brand-primary animate-float" />
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 4" class="absolute top-[45%] left-[10%] w-20 h-20 rounded-full object-cover shadow-xl border-[3px] border-brand-secondary animate-float-delayed" />
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=facearea&facepad=2&w=200&h=200" alt="Student 6" class="absolute top-[35%] right-[25%] w-32 h-32 rounded-full object-cover shadow-glow border-4 border-brand-primary z-10 animate-float" />
+                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 8" class="absolute bottom-[10%] left-[35%] w-24 h-24 rounded-full object-cover shadow-xl border-[3px] border-brand-primary animate-float-delayed" />
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=facearea&facepad=2&w=150&h=150" alt="Student 10" class="absolute bottom-[15%] right-[10%] w-16 h-16 rounded-full object-cover shadow-xl border-[3px] border-brand-secondary animate-float" />
+            </div>
         </div>
+    </section>
 
-        <div class="sticky top-[140px] bg-white rounded-[0.8] p-8 sm:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-4 transition-all">
-          <div class="mb-4 text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
-          </div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold text-[#1A1A1A]">Modern Ad Products</h3>
-            <span class="text-lg font-medium text-gray-400">03</span>
-          </div>
-          <p class="text-gray-500 leading-relaxed text-[15px]">
-            Performance Max, Demand Gen, Advantage+ - master the latest campaign types that drive results in 2026.
-          </p>
+    <!-- Sticky Features -->
+    <section class="bg-brand-light py-24 px-6 sm:px-10 lg:px-16 border-b border-gray-200">
+        <div class="max-w-[1400px] mx-auto flex flex-col lg:flex-row gap-16 relative">
+            
+            <div class="w-full lg:w-1/2 flex flex-col pb-[10vh] reveal-left">
+                <div class="mb-14">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-200 bg-brand-accent text-[13px] font-bold text-brand-primary mb-6 shadow-sm">
+                        <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Core Advantages
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl font-extrabold text-brand-darker tracking-tight mb-5 leading-[1.1]">
+                        What makes this program 2026-Ready
+                    </h2>
+                    <p class="text-gray-600 text-lg leading-relaxed max-w-xl">
+                        This curriculum is not a recycled course from 2020. Every module reflects what actually works right now built for the AI era, privacy-first advertising, and the Indian digital market.
+                    </p>
+                </div>
+
+                <div class="flex flex-col relative space-y-4">
+                    
+                    <div class="sticky top-[100px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                        <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-bold text-brand-darker">AI-First Throughout</h3>
+                            <span class="text-2xl font-extrabold text-gray-100">01</span>
+                        </div>
+                        <p class="text-gray-500 leading-relaxed text-lg">
+                            GEO/AI Overviews SEO, prompt engineering, AI agents, AI creative tools - AI is woven into every module, not bolted on as an afterthought.
+                        </p>
+                    </div>
+
+                    <div class="sticky top-[120px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                        <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-bold text-brand-darker">Privacy-Era Tracking</h3>
+                            <span class="text-2xl font-extrabold text-gray-100">02</span>
+                        </div>
+                        <p class="text-gray-500 leading-relaxed text-lg">
+                            GA4, Conversions API, Consent Mode v2, server-side concepts - learn how to track accurately in a cookieless world.
+                        </p>
+                    </div>
+
+                    <div class="sticky top-[140px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                        <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+                        </div>
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-2xl font-bold text-brand-darker">Modern Ad Products</h3>
+                            <span class="text-2xl font-extrabold text-gray-100">03</span>
+                        </div>
+                        <p class="text-gray-500 leading-relaxed text-lg">
+                            Performance Max, Demand Gen, Advantage+ - master the latest campaign types that drive results in 2026.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="w-full lg:w-1/2 h-[50vh] lg:h-auto relative mt-8 reveal-right">
+                <div class="sticky top-[100px] w-full h-[calc(100vh-200px)] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 group">
+                    <div class="absolute inset-0 bg-brand-dark mix-blend-overlay opacity-20 group-hover:opacity-0 transition-opacity duration-500 z-10"></div>
+                    <img src="stu.png" alt="Team reviewing data and strategy" class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" />
+                </div>
+            </div>
+
         </div>
-
-        <div class="sticky top-[160px] bg-white rounded-[0.8] p-8 sm:p-10 border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-4 transition-all">
-          <div class="mb-4 text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-          </div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold text-[#1A1A1A]">Short-Form Video Native</h3>
-            <span class="text-lg font-medium text-gray-400">04</span>
-          </div>
-          <p class="text-gray-500 leading-relaxed text-[15px]">
-            Reels/Shorts strategy, scripting, and editing built into the core curriculum not a bonus chapter.
-          </p>
-        </div>
-
-        <div class="sticky top-[180px] bg-white rounded-[0.8] p-8 sm:p-10 border border-gray-100 shadow-[0_20px_40px_rgb(0,0,0,0.08)] mb-4 transition-all">
-          <div class="mb-4 text-gray-600">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-          </div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-2xl font-semibold text-[#1A1A1A]">WhatsApp-First Skills</h3>
-            <span class="text-lg font-medium text-gray-400">05</span>
-          </div>
-          <p class="text-gray-500 leading-relaxed text-[15px]">
-            Business API, broadcast automation, CRM integration skills specifically tuned for the Indian market.
-          </p>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="w-full lg:w-1/2 h-[50vh] lg:h-auto relative mt-8">
-      <div class="sticky top-[20px] sm:top-[150px] w-full h-[calc(100vh-240px)] rounded-[1rem] overflow-hidden shadow-xl border">
-        <img src="stu.png" alt="Team reviewing data and strategy" class="w-full h-full object-cover object-center" />
-      </div>
-    </div>
-
-  </div>
-</section>
+    </section>
 
     <!-- ================= PHASE 2: 6 MONTH INTERNSHIP ================= -->
     <section id="internship" class="py-24 bg-white relative">
-        <div class="container mx-auto px-6 lg:px-12">
+        <div class="container mx-auto px-6 lg:px-12 max-w-[1400px]">
             
             <div class="flex flex-col lg:flex-row justify-between items-end gap-8 mb-16 reveal">
                 <div class="max-w-2xl">
-                    <h5 class="text-gray-600 font-bold tracking-widest text-xs mb-4 uppercase">Phase 2: Months 7-12</h5>
-                    <h2 class="text-3xl lg:text-5xl font-bold text-brand-dark">Real Internship, Real Portfolios</h2>
+                    <h5 class="text-brand-primary font-bold tracking-widest text-sm mb-4 uppercase">Phase 2: Months 7-12</h5>
+                    <h2 class="text-4xl lg:text-5xl font-extrabold text-brand-darker">Real Internship, Real Portfolios</h2>
                 </div>
-                <p class="text-gray-800 max-w-sm">Apply knowledge on real businesses under mentor supervision, rotating through tracks and finishing with an independent client project.</p>
+                <p class="text-gray-600 text-lg max-w-md lg:text-right">Apply knowledge on real businesses under mentor supervision, rotating through tracks and finishing with an independent client project.</p>
             </div>
 
             <!-- Bento Box Style Grid for Internship Tracks -->
             <div class="grid lg:grid-cols-3 gap-6">
+                
                 <!-- Track 1 -->
-                <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 reveal hover:shadow-md transition-all duration-300">
-                    <div class="w-12 h-12 bg-white text-brand-purpleBtn rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                        <div class="flex items-center gap-3 text-gray-600">
-  <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="11" cy="11" r="8" stroke-width="1.5"></circle>
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35"></path>
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 13l2.5-2.5 2 2 3.5-3.5"></path>
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 9h4v4"></path>
-  </svg>
-</div>
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300">
+                    <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+                        <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 13l2.5-2.5 2 2 3.5-3.5"></path></svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-brand-dark mb-3">SEO & Website Track</h3>
-                    <p class="text-sm text-gray-500 mb-6">Manage SEO for a real client: audits, on-page fixes, content publishing, GBP management.</p>
-                    <div class="bg-white rounded-lg p-4 text-xs font-semibold text-gray-800 border border-gray-100">
+                    <h3 class="text-2xl font-bold text-brand-darker mb-4">SEO & Website Track</h3>
+                    <p class="text-[15px] text-gray-500 mb-8 leading-relaxed">Manage SEO for a real client: audits, on-page fixes, content publishing, GBP management.</p>
+                    <div class="bg-white rounded-xl p-4 text-[13px] font-bold text-gray-700 border border-gray-200 shadow-sm">
                         Deliverable: Ranking improvement report, 4 optimized pages.
                     </div>
                 </div>
 
                 <!-- Track 2 -->
-                <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 reveal hover:shadow-md transition-all duration-300" style="transition-delay: 100ms;">
-                    <div class="w-12 h-12 bg-white text-brand-purpleBtn rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                      <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="18" cy="5" r="3" stroke-width="1.5"></circle>
-  <circle cx="6" cy="12" r="3" stroke-width="1.5"></circle>
-  <circle cx="18" cy="19" r="3" stroke-width="1.5"></circle>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.59 13.51l6.83 3.98"></path>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.41 6.51l-6.82 3.98"></path>
-</svg>
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-100">
+                    <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+                        <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" stroke-width="2"></circle><circle cx="6" cy="12" r="3" stroke-width="2"></circle><circle cx="18" cy="19" r="3" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path></svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-brand-dark mb-3">Paid Ads Track</h3>
-                    <p class="text-sm text-gray-500 mb-6">Run live Google & Meta campaigns with real budgets under strict supervision.</p>
-                    <div class="bg-white rounded-lg p-4 text-xs font-semibold text-gray-800 border border-gray-100">
-                        Deliverable: Campaign launch docs, ROAS report.
+                    <h3 class="text-2xl font-bold text-brand-darker mb-4">Paid Ads Track</h3>
+                    <p class="text-[15px] text-gray-500 mb-8 leading-relaxed">Run live Google & Meta campaigns with real budgets under strict supervision to drive conversions.</p>
+                    <div class="bg-white rounded-xl p-4 text-[13px] font-bold text-gray-700 border border-gray-200 shadow-sm">
+                        Deliverable: Campaign launch docs, live ROAS report.
                     </div>
                 </div>
 
                 <!-- Track 3 -->
-                <div class="bg-gray-50 rounded-xl p-8 border border-gray-100 reveal hover:shadow-md transition-all duration-300" style="transition-delay: 200ms;">
-                    <div class="w-12 h-12 bg-white text-brand-purpleBtn rounded-full flex items-center justify-center mb-6 shadow-sm border border-gray-100">
-                       <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <circle cx="12" cy="12" r="9" stroke-width="1.5"></circle>
-  <circle cx="12" cy="12" r="5" stroke-width="1.5"></circle>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 12l8-8"></path>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 4h5v5"></path>
-</svg>
+                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-200">
+                    <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
+                        <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"></circle><circle cx="12" cy="12" r="5" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l8-8M15 4h5v5"></path></svg>
                     </div>
-                    <h3 class="text-xl font-semibold text-brand-dark mb-3">Social & Content</h3>
-                    <p class="text-sm text-gray-500 mb-6">Own a brand's channels: content calendar, creatives, reels, and community management.</p>
-                    <div class="bg-white rounded-lg p-4 text-xs font-semibold text-gray-800 border border-gray-100">
+                    <h3 class="text-2xl font-bold text-brand-darker mb-4">Social & Content</h3>
+                    <p class="text-[15px] text-gray-500 mb-8 leading-relaxed">Own a brand's channels: content calendar, creative direction, reels, and community management.</p>
+                    <div class="bg-white rounded-xl p-4 text-[13px] font-bold text-gray-700 border border-gray-200 shadow-sm">
                         Deliverable: 30 published posts, growth analytics.
                     </div>
                 </div>
 
-                <!-- Track 4 (Wide) -->
-                <div class="lg:col-span-2 bg-brand-dark rounded-xl p-8 shadow-card reveal relative overflow-hidden text-white flex flex-col justify-center">
+                <!-- Track 4 (Wide Dark) -->
+                <div class="lg:col-span-2 bg-brand-darker rounded-3xl p-10 shadow-2xl reveal relative overflow-hidden text-white flex flex-col justify-center border border-gray-800 group hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute inset-0 bg-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl"></div>
                     <div class="relative z-10">
-                        <div class="flex gap-4 mb-4">
-                     <svg class="w-6 h-6 text-white" fill="none" stroke="white" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <rect x="3" y="3" width="6" height="6" rx="1.5" stroke-width="1.5"></rect>
-  <rect x="15" y="3" width="6" height="6" rx="1.5" stroke-width="1.5"></rect>
-  <rect x="9" y="15" width="6" height="6" rx="1.5" stroke-width="1.5"></rect>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 9v2c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9"></path>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 13v2"></path>
-</svg>       </div>
-                        <h3 class="text-2xl font-semibold mb-3">Automation & Independent Project</h3>
-                        <p class="text-brand-light/70 text-sm max-w-md">Build CRM workflows, WhatsApp funnels, and then handle one small business end-to-end to build your final case study.</p>
+                        <div class="w-14 h-14 bg-gray-800 rounded-2xl flex items-center justify-center mb-6 border border-gray-700">
+                            <svg class="w-7 h-7 text-white" fill="none" stroke="white" viewBox="0 0 24 24"><rect x="3" y="3" width="6" height="6" rx="1.5" stroke-width="2"></rect><rect x="15" y="3" width="6" height="6" rx="1.5" stroke-width="2"></rect><rect x="9" y="15" width="6" height="6" rx="1.5" stroke-width="2"></rect><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 9v2c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9M12 13v2"></path></svg>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-4">Automation & Independent Project</h3>
+                        <p class="text-gray-300 text-lg max-w-xl leading-relaxed">Build CRM workflows, WhatsApp funnels, and handle one small business end-to-end to construct your final case study.</p>
                     </div>
                 </div>
 
-                <!-- Track 5 -->
-                <div class="bg-brand-purpleBtn rounded-xl p-8 shadow-md reveal flex flex-col justify-center text-white">
-                    <div class="w-12 h-12 bg-white text-brand-purpleBtn rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-6 h-6 text-brand-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-width="1.5"></rect>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11v6"></path>
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14l3-3 3 3"></path>
-</svg>
+                <!-- Track 5 (Orange Accent) -->
+                <div class="bg-brand-primary rounded-3xl p-10 shadow-glow reveal flex flex-col justify-center text-white hover:bg-brand-primaryHover transition-colors duration-300 group hover:-translate-y-1">
+                    <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
+                        <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-width="2"></rect><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M12 11v6M9 14l3-3 3 3"></path></svg>
                     </div>
-                    <h3 class="text-xl font-semibold mb-3">Placement Sprint</h3>
-                    <p class="text-sm text-white/80 font-medium">Deep-dive in chosen specialization, final portfolio, mock interviews, placement drive.</p>
+                    <h3 class="text-3xl font-bold mb-4">Placement Sprint</h3>
+                    <p class="text-lg text-white/90 font-medium leading-relaxed">Deep-dive in chosen specialization, final portfolio, mock interviews, and placement drives.</p>
                 </div>
+
             </div>
         </div>
     </section>
-<section id="testimonial" class="py-4 sm:py-20 overflow-hidden relative bg-white">
-  <div class="max-w-[1400px] mx-auto px-6 lg:px-8">
-    
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-8">
-      
-      <div class="max-w-2xl">
-        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-gray-200 bg-white shadow-sm text-sm font-semibold text-gray-800 mb-6">
-          <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-          </svg>
-          Student Success
-        </div>
-        <h2 class="text-4xl md:text-5xl font-bold text-[#1A1A1A] leading-[1.1] tracking-tight">
-          Trusted by Placed<br/>Digital Marketers
-        </h2>
-      </div>
 
-      <div class="max-w-md md:text-right">
-        <p class="text-gray-800 text-[15px] leading-relaxed mb-5 md:ml-auto">
-          Our 12-month program has helped ambitious individuals master AI tools, complete real internships, and launch successful marketing careers.
-        </p>
-        <button onclick="scrollToForm()" class="inline-block bg-black hover:bg-black/90 transition-colors text-white font-medium px-6 py-3 rounded-lg shadow-md">
-          Enrol Now
-        </button>
-      </div>
+    <!-- Testimonials Section -->
+    <section id="testimonial" class="py-24 overflow-hidden relative bg-brand-light border-y border-gray-200">
+        <div class="max-w-[1400px] mx-auto px-6 lg:px-12">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8 reveal">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-200 bg-brand-accent text-sm font-bold text-brand-primary mb-6">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
+                        Student Success
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-brand-darker leading-[1.1] tracking-tight">
+                        Trusted by Placed<br/>Digital Marketers
+                    </h2>
+                </div>
 
-    </div>
-
-  </div>
-
-  <div class="relative bg-white w-full mx-auto px-4 sm:px-6 lg:px-8 group">
-    
-    <button id="slideLeft" class="absolute left-6 lg:left-12 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 shadow-lg cursor-pointer">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-    </button>
-    
-    <button id="slideRight" class="absolute right-6 lg:right-12 top-1/2 -translate-y-1/2 z-20 w-12 h-12 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-md border border-white/20 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 shadow-lg cursor-pointer">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-    </button>
-<div id="testimonialSlider" class="flex gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-8 pt-4">
-      
-      <div class="w-[85vw] sm:w-[380px] md:w-[420px] h-80 flex-shrink-0 snap-center relative rounded-xl overflow-hidden shadow-xl bg-[#2a2a2a]">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full">
-          <p class="text-white text-lg md:text-xl font-medium leading-relaxed mb-8">
-            "The AI-First curriculum gave me a massive edge. Knowing how to use generative AI for SEO and Performance Max campaigns got me hired immediately."
-          </p>
-          <div class="flex justify-between items-end border-t border-white/20 pt-5">
-             <div class="flex items-center gap-2 text-white">
-                <svg class="w-5 h-5 text-[#6B46C1]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
-                <span class="font-bold tracking-wider text-sm uppercase">AGENCY X</span>
-             </div>
-             <div class="text-right">
-               <div class="font-bold text-white">Rahul Desai</div>
-               <div class="text-sm text-gray-300">Growth Marketer</div>
-             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-[85vw] sm:w-[380px] md:w-[420px]  h-80 flex-shrink-0 snap-center relative rounded-xl overflow-hidden aspect-[4/5] shadow-xl bg-[#2a2a2a]">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full">
-          <p class="text-white text-lg md:text-xl font-medium leading-relaxed mb-8">
-            "The 6-month internship was the game-changer. Managing real client budgets during the Paid Ads track built the exact portfolio employers want to see."
-          </p>
-          <div class="flex justify-between items-end border-t border-white/20 pt-5">
-             <div class="flex items-center gap-2 text-white">
-                <svg class="w-5 h-5 text-[#38bdf8]" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-                <span class="font-bold tracking-wider text-sm uppercase">MEDIA CORP</span>
-             </div>
-             <div class="text-right">
-               <div class="font-bold text-white">Priya Sharma</div>
-               <div class="text-sm text-gray-300">Performance Lead</div>
-             </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="w-[85vw] sm:w-[380px] md:w-[420px] h-80 flex-shrink-0 snap-center relative rounded-xl overflow-hidden aspect-[4/5] shadow-xl bg-[#2a2a2a]">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full">
-          <p class="text-white text-lg md:text-xl font-medium leading-relaxed mb-8">
-            "This isn't a recycled 2020 course. Learning WhatsApp Business APIs and GA4 prepared me for the actual realities of the digital landscape."
-          </p>
-          <div class="flex justify-between items-end border-t border-white/20 pt-5">
-             <div class="flex items-center gap-2 text-white">
-                <svg class="w-5 h-5 text-[#f43f5e]" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
-                <span class="font-bold tracking-wider text-sm uppercase">STARTUP INC</span>
-             </div>
-             <div class="text-right">
-               <div class="font-bold text-white">Kabir Singh</div>
-               <div class="text-sm text-gray-300">CRM Specialist</div>
-             </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="w-[85vw] sm:w-[380px] md:w-[420px] h-80 flex-shrink-0 snap-center relative rounded-xl overflow-hidden aspect-[4/5] shadow-xl bg-[#2a2a2a]">
-        <div class="absolute inset-0 bg-gradient-to-t from-[#1a1a1a] via-[#1a1a1a]/60 to-transparent"></div>
-        <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full">
-          <p class="text-white text-lg md:text-xl font-medium leading-relaxed mb-8">
-            "The 12-module structure is flawless. Building an end-to-end Capstone project gave me the exact portfolio needed to secure freelance clients."
-          </p>
-          <div class="flex justify-between items-end border-t border-white/20 pt-5">
-             <div class="flex items-center gap-2 text-white">
-                <svg class="w-5 h-5 text-[#10b981]" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
-                <span class="font-bold tracking-wider text-sm uppercase">FREELANCE</span>
-             </div>
-             <div class="text-right">
-               <div class="font-bold text-white">Anjali Verma</div>
-               <div class="text-sm text-gray-300">SEO Consultant</div>
-             </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-    <!-- ================= PRICING / PLANS ================= -->
-    <section class="py-20 px-6 sm:px-10 lg:px-16 bg-white">
-  <div class="flex flex-col lg:flex-row gap-16 lg:gap-24 max-w-[1400px]  mx-auto">
-    
-    <div class="w-full lg:w-[35%] flex flex-col items-start">
-      
-      <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gray-200 bg-white text-[13px] font-medium text-gray-800 mb-8 shadow-sm">
-        <span class="w-1.5 h-1.5 rounded-full bg-gray-800"></span> FAQ
-      </span>
-      
-      <h2 class="text-4xl md:text-[2.75rem] font-semibold text-[#1A1A1A] leading-[1.1] tracking-tight mb-4">
-        Frequently Asked<br/>Questions
-      </h2>
-     
-      
-      <div class="bg-white border border-gray-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-xl p-8 w-full max-w-md">
-        <h3 class="text-xl font-semibold text-[#1A1A1A] mb-3">Have another question?</h3>
-        <p class="text-gray-500 text-[15px] leading-relaxed mb-6">
-          Send us an email and we will respond within 24 hours.
-        </p>
-         <a href="tel:+919145840133" class="inline-flex items-center justify-center w-full gap-3 bg-[#F9FAFB] hover:bg-gray-100 transition-colors text-[#1A1A1A] font-medium text-[15px] py-3.5 px-6 rounded-lg border border-gray-100">
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-</svg>
-          +91 91458 40133
-        </a>
-        <a href="mailto:hello@digitalprogram.com" class="inline-flex mt-3 items-center justify-center w-full gap-3 bg-[#F9FAFB] hover:bg-gray-100 transition-colors text-[#1A1A1A] font-medium text-[15px] py-3.5 px-6 rounded-lg border border-gray-100">
-          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-          hello@digitalprogram.com
-        </a>
-      </div>
-    </div>
-
-    <div class="w-full lg:w-[65%] flex flex-col gap-4 pt-4 lg:pt-0">
-      
-      <div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq1" class="hidden peer">
-        <label for="faq1" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>Do I need any previous marketing experience?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    No prior experience is necessary. The 180-hour training begins with a comprehensive Digital Marketing Foundation module. We cover everything from the ground up, ensuring you are fully prepared before moving into advanced topics like AI Search and Performance Marketing.
+                <div class="max-w-md md:text-right">
+                    <p class="text-gray-600 text-lg leading-relaxed mb-6 md:ml-auto">
+                        Our 12-month program has helped ambitious individuals master AI tools, complete real internships, and launch successful marketing careers.
+                    </p>
+                    <button onclick="scrollToForm()" class="inline-block items-center gap-2 btn-primary-img px-5 py-2 font-medium text-sm transition-all duration-300 transform hover:-translate-y-0.5">
+                        Enroll Now
+                    </button>
                 </div>
             </div>
         </div>
-      </div>
 
-      <div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq2" class="hidden peer">
-        <label for="faq2" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>How does the 6-month internship work?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    During Phase 2 (Months 7-12), you will transition from classroom training to applying your knowledge on real businesses under mentor supervision. You will rotate through specializations—including SEO, Paid Ads, and Social Content tracks—and handle an independent client project end-to-end to build a guaranteed professional portfolio.
+        <div class="relative w-full mx-auto px-4 sm:px-6 lg:px-12 group reveal-scale delay-200">
+            
+            <button id="slideLeft" class="absolute left-6 lg:left-16 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white hover:bg-gray-50 border border-gray-200 text-brand-darker flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 shadow-xl cursor-pointer">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            </button>
+            
+            <button id="slideRight" class="absolute right-6 lg:right-16 top-1/2 -translate-y-1/2 z-20 w-14 h-14 rounded-full bg-white hover:bg-gray-50 border border-gray-200 text-brand-darker flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 focus:opacity-100 shadow-xl cursor-pointer">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </button>
+            
+            <div id="testimonialSlider" class="flex gap-8 overflow-x-auto snap-x snap-mandatory scroll-smooth no-scrollbar pb-12 pt-4 px-4">
+                
+                <!-- Card 1 -->
+                <div class="w-[85vw] sm:w-[400px] h-80 flex-shrink-0 snap-center relative rounded-3xl overflow-hidden shadow-2xl bg-brand-dark border border-gray-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-darker via-brand-dark/80 to-transparent z-0"></div>
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <i class="fa-solid fa-quote-right text-6xl text-brand-primary"></i>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full z-10">
+                        <p class="text-white text-lg font-medium leading-relaxed mb-8">
+                            "The AI-First curriculum gave me a massive edge. Knowing how to use generative AI for SEO and Performance Max campaigns got me hired immediately."
+                        </p>
+                        <div class="flex justify-between items-end border-t border-gray-600 pt-5">
+                            <div class="flex items-center gap-3 text-brand-primary">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2z"/></svg>
+                                <span class="font-bold tracking-wider text-sm uppercase">AGENCY X</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-white text-lg">Rahul Desai</div>
+                                <div class="text-sm text-gray-400">Growth Marketer</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-      </div>
 
-      <div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq3" class="hidden peer">
-        <label for="faq3" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>What makes this an "AI-First" curriculum?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    Unlike recycled courses, our 2026-Edition program weaves AI into every single module. You will learn GEO (Generative Engine Optimization), AI prompt engineering, how to build AI chatbots for lead generation, and how to scale content using tools like ChatGPT, Gemini, and Midjourney.
+                <!-- Card 2 -->
+                <div class="w-[85vw] sm:w-[400px] h-80 flex-shrink-0 snap-center relative rounded-3xl overflow-hidden shadow-2xl bg-brand-dark border border-gray-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-darker via-brand-dark/80 to-transparent z-0"></div>
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <i class="fa-solid fa-quote-right text-6xl text-brand-primary"></i>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full z-10">
+                        <p class="text-white text-lg font-medium leading-relaxed mb-8">
+                            "The 6-month internship was the game-changer. Managing real client budgets during the Paid Ads track built the exact portfolio employers want to see."
+                        </p>
+                        <div class="flex justify-between items-end border-t border-gray-600 pt-5">
+                            <div class="flex items-center gap-3 text-brand-primary">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                                <span class="font-bold tracking-wider text-sm uppercase">MEDIA CORP</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-white text-lg">Priya Sharma</div>
+                                <div class="text-sm text-gray-400">Performance Lead</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-      </div>
 
-      <div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq4" class="hidden peer">
-        <label for="faq4" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>What is the weekly schedule like?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    Phase 1 consists of 7.5 hours of live training per week, broken down into three 2.5-hour sessions. During the Phase 2 internship, you will commit 15-20 hours per week for client work, including a weekly team standup and mentor review session.
+                <!-- Card 3 -->
+                <div class="w-[85vw] sm:w-[400px] h-80 flex-shrink-0 snap-center relative rounded-3xl overflow-hidden shadow-2xl bg-brand-dark border border-gray-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-darker via-brand-dark/80 to-transparent z-0"></div>
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <i class="fa-solid fa-quote-right text-6xl text-brand-primary"></i>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full z-10">
+                        <p class="text-white text-lg font-medium leading-relaxed mb-8">
+                            "This isn't a recycled 2020 course. Learning WhatsApp Business APIs and GA4 prepared me for the actual realities of the digital landscape."
+                        </p>
+                        <div class="flex justify-between items-end border-t border-gray-600 pt-5">
+                            <div class="flex items-center gap-3 text-brand-primary">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>
+                                <span class="font-bold tracking-wider text-sm uppercase">STARTUP INC</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-white text-lg">Kabir Singh</div>
+                                <div class="text-sm text-gray-400">CRM Specialist</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-      </div>
+                
+                <!-- Card 4 -->
+                <div class="w-[85vw] sm:w-[400px] h-80 flex-shrink-0 snap-center relative rounded-3xl overflow-hidden shadow-2xl bg-brand-dark border border-gray-700">
+                    <div class="absolute inset-0 bg-gradient-to-t from-brand-darker via-brand-dark/80 to-transparent z-0"></div>
+                    <div class="absolute top-0 right-0 p-6 opacity-20">
+                        <i class="fa-solid fa-quote-right text-6xl text-brand-primary"></i>
+                    </div>
+                    <div class="absolute bottom-0 left-0 right-0 p-8 flex flex-col justify-end h-full z-10">
+                        <p class="text-white text-lg font-medium leading-relaxed mb-8">
+                            "The 12-module structure is flawless. Building an end-to-end Capstone project gave me the exact portfolio needed to secure freelance clients."
+                        </p>
+                        <div class="flex justify-between items-end border-t border-gray-600 pt-5">
+                            <div class="flex items-center gap-3 text-brand-primary">
+                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>
+                                <span class="font-bold tracking-wider text-sm uppercase">FREELANCE</span>
+                            </div>
+                            <div class="text-right">
+                                <div class="font-bold text-white text-lg">Anjali Verma</div>
+                                <div class="text-sm text-gray-400">SEO Consultant</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-      <div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq5" class="hidden peer">
-        <label for="faq5" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>Which tools and platforms will I master?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    You will master 12+ industry tools spanning modern ad products and analytics. This includes deep-dives into Google Ads (Performance Max), Meta Advantage+, Google Analytics 4 (GA4), WhatsApp Business APIs, SEMrush, Canva, and marketing automation CRMs.
-                </div>
             </div>
         </div>
-      </div>
-<div class="bg-[#F8F9FA] rounded-2xl overflow-hidden group transition-colors hover:bg-[#f1f3f5]">
-        <input type="checkbox" id="faq6" class="hidden peer">
-        <label for="faq6" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-medium text-[17px] text-[#1A1A1A]">
-            <span>What kind of portfolio will I build during the program?</span>
-            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180 text-gray-500 flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </label>
-        <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
-            <div class="overflow-hidden">
-                <div class="p-6 sm:px-8 pt-0 text-gray-600 text-[15px] leading-relaxed">
-                    Every module ends with a real portfolio deliverable. By the end of the program, you will have built a live WordPress website, a professional SEO audit report, live paid ad campaigns, a 30-day social media strategy, automated Looker Studio dashboards, and a complete end-to-end Capstone marketing project.
+    </section>
+
+    <!-- ================= PRICING / PLANS / FAQ ================= -->
+    <section class="py-24 px-6 sm:px-10 lg:px-12 bg-white" id="pricing">
+        <div class="flex flex-col lg:flex-row gap-16 lg:gap-24 max-w-[1400px] mx-auto">
+            
+            <div class="w-full lg:w-[35%] flex flex-col items-start reveal-left">
+                
+                <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-orange-200 bg-brand-accent text-sm font-bold text-brand-primary mb-6">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> FAQ
+                </span>
+                
+                <h2 class="text-4xl md:text-5xl font-extrabold text-brand-darker leading-[1.1] tracking-tight mb-8">
+                    Frequently Asked<br/>Questions
+                </h2>
+                
+                <div class="bg-brand-light border border-gray-200 shadow-xl rounded-3xl p-8 w-full">
+                    <h3 class="text-2xl font-bold text-brand-darker mb-3">Have another question?</h3>
+                    <p class="text-gray-500 text-lg leading-relaxed mb-8">
+                        Send us an email and we will respond within 24 hours.
+                    </p>
+                    <a href="tel:+919145840133" class="inline-flex items-center justify-center w-full gap-3 bg-white hover:border-brand-primary transition-colors text-brand-darker font-bold text-[16px] py-4 px-6 rounded-xl border border-gray-200 shadow-sm">
+                        <svg class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        +91 91458 40133
+                    </a>
+                    <a href="mailto:hello@digitalprogram.com" class="inline-flex mt-4 items-center justify-center w-full gap-3 bg-white hover:border-brand-primary transition-colors text-brand-darker font-bold text-[16px] py-4 px-6 rounded-xl border border-gray-200 shadow-sm">
+                        <svg class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                        hello@digitalprogram.com
+                    </a>
                 </div>
             </div>
+
+            <div class="w-full lg:w-[65%] flex flex-col gap-5 reveal-right">
+                
+                <div class="bg-brand-light rounded-3xl overflow-hidden group transition-all border border-gray-100 hover:border-brand-primary/40 hover:shadow-md">
+                    <input type="checkbox" id="faq1" class="hidden peer">
+                    <label for="faq1" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-bold text-lg text-brand-darker">
+                        <span>Do I need any previous marketing experience?</span>
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary flex-shrink-0 ml-4 peer-checked:bg-brand-primary peer-checked:text-white transition-all">
+                            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </label>
+                    <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                            <div class="p-6 sm:px-8 pt-0 text-gray-600 text-lg leading-relaxed">
+                                No prior experience is necessary. The 180-hour training begins with a comprehensive Digital Marketing Foundation module. We cover everything from the ground up, ensuring you are fully prepared before moving into advanced topics like AI Search and Performance Marketing.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-light rounded-3xl overflow-hidden group transition-all border border-gray-100 hover:border-brand-primary/40 hover:shadow-md">
+                    <input type="checkbox" id="faq2" class="hidden peer">
+                    <label for="faq2" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-bold text-lg text-brand-darker">
+                        <span>How does the 6-month internship work?</span>
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary flex-shrink-0 ml-4 peer-checked:bg-brand-primary peer-checked:text-white transition-all">
+                            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </label>
+                    <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                            <div class="p-6 sm:px-8 pt-0 text-gray-600 text-lg leading-relaxed">
+                                During Phase 2 (Months 7-12), you will transition from classroom training to applying your knowledge on real businesses under mentor supervision. You will rotate through specializations—including SEO, Paid Ads, and Social Content tracks—and handle an independent client project end-to-end.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-light rounded-3xl overflow-hidden group transition-all border border-gray-100 hover:border-brand-primary/40 hover:shadow-md">
+                    <input type="checkbox" id="faq3" class="hidden peer">
+                    <label for="faq3" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-bold text-lg text-brand-darker">
+                        <span>What makes this an "AI-First" curriculum?</span>
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary flex-shrink-0 ml-4 peer-checked:bg-brand-primary peer-checked:text-white transition-all">
+                            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </label>
+                    <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                            <div class="p-6 sm:px-8 pt-0 text-gray-600 text-lg leading-relaxed">
+                                Unlike recycled courses, our 2026-Edition program weaves AI into every single module. You will learn GEO (Generative Engine Optimization), AI prompt engineering, how to build AI chatbots for lead generation, and how to scale content using tools like ChatGPT, Gemini, and Midjourney.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-light rounded-3xl overflow-hidden group transition-all border border-gray-100 hover:border-brand-primary/40 hover:shadow-md">
+                    <input type="checkbox" id="faq4" class="hidden peer">
+                    <label for="faq4" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-bold text-lg text-brand-darker">
+                        <span>What is the weekly schedule like?</span>
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary flex-shrink-0 ml-4 peer-checked:bg-brand-primary peer-checked:text-white transition-all">
+                            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </label>
+                    <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                            <div class="p-6 sm:px-8 pt-0 text-gray-600 text-lg leading-relaxed">
+                                Phase 1 consists of 7.5 hours of live training per week, broken down into three 2.5-hour sessions. During the Phase 2 internship, you will commit 15-20 hours per week for client work, including a weekly team standup and mentor review session.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-brand-light rounded-3xl overflow-hidden group transition-all border border-gray-100 hover:border-brand-primary/40 hover:shadow-md">
+                    <input type="checkbox" id="faq5" class="hidden peer">
+                    <label for="faq5" class="flex justify-between items-center p-6 sm:px-8 cursor-pointer font-bold text-lg text-brand-darker">
+                        <span>Which tools and platforms will I master?</span>
+                        <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm text-brand-primary flex-shrink-0 ml-4 peer-checked:bg-brand-primary peer-checked:text-white transition-all">
+                            <svg class="w-5 h-5 transition-transform duration-300 peer-checked:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </div>
+                    </label>
+                    <div class="grid grid-rows-[0fr] transition-all duration-300 peer-checked:grid-rows-[1fr]">
+                        <div class="overflow-hidden">
+                            <div class="p-6 sm:px-8 pt-0 text-gray-600 text-lg leading-relaxed">
+                                You will master 12+ industry tools spanning modern ad products and analytics. This includes deep-dives into Google Ads (Performance Max), Meta Advantage+, Google Analytics 4 (GA4), WhatsApp Business APIs, SEMrush, Canva, and marketing automation CRMs.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <!-- ================= FOOTER ================= -->
-    <footer class="bg-black pt-20 pb-10 border-t border-white/10 text-white">
-        <div class="container mx-auto px-6 lg:px-12">
+    <footer class="bg-brand-darker pt-20 pb-10 border-t border-gray-800 text-white relative overflow-hidden">
+        <div class="container mx-auto px-6 lg:px-12 relative z-10">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+                
                 <div class="md:col-span-2">
                     <a href="#" class="flex items-center gap-3 mb-6">
-                        <img src="https://openshift.grras.com/frontassets/img/logo.png" class="w-16"/>
+                        <img src="https://openshift.grras.com/frontassets/img/logo.png" class="w-32 brightness-0 invert"/>
                     </a>
-                    <p class="text-gray-50 max-w-sm mb-8 font-medium">
+                    <p class="text-gray-400 max-w-sm mb-8 font-medium text-lg">
                         The comprehensive 2026 digital marketing career program designed to take you from a beginner to a job-ready professional.
                     </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-primary transition-colors"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-primary transition-colors"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-brand-primary transition-colors"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
                 </div>
                 
                 <div>
-                    <h4 class="font-bold text-white mb-6 tracking-wide">Quick Links</h4>
-                    <ul class="space-y-4 text-sm font-semibold text-gray-400">
-                        <li><a href="#features" class="hover:text-brand-purpleBtn transition">Features</a></li>
-                        <li><a href="#curriculum" class="hover:text-brand-purpleBtn transition">Curriculum</a></li>
-                        <li><a href="#internship" class="hover:text-brand-purpleBtn transition">Internship Tracks</a></li>
-                        <li><a href="#testimonial" class="hover:text-brand-purpleBtn transition">Testimonial</a></li>
+                    <h4 class="font-bold text-white text-xl mb-6 tracking-wide">Quick Links</h4>
+                    <ul class="space-y-4 text-[15px] font-semibold text-gray-400">
+                        <li><a href="#features" class="hover:text-brand-primary transition flex items-center gap-2"><i class="fa-solid fa-angle-right text-xs"></i> Features</a></li>
+                        <li><a href="#curriculum" class="hover:text-brand-primary transition flex items-center gap-2"><i class="fa-solid fa-angle-right text-xs"></i> Curriculum</a></li>
+                        <li><a href="#internship" class="hover:text-brand-primary transition flex items-center gap-2"><i class="fa-solid fa-angle-right text-xs"></i> Internship Tracks</a></li>
+                        <li><a href="#testimonial" class="hover:text-brand-primary transition flex items-center gap-2"><i class="fa-solid fa-angle-right text-xs"></i> Testimonial</a></li>
                     </ul>
                 </div>
-<div class="rounded-2xl overflow-hidden shadow-sm inline-block w-fit">
-    <iframe 
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4221.8430545221545!2d75.8030627!3d26.867326900000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db5c3b469d459%3A0x9a055be452b02e03!2sGrras%20Solutions%20Pvt.%20Ltd.!5e1!3m2!1sen!2sin!4v1781174319293!5m2!1sen!2sin" 
-        width="300" 
-        height="250" 
-        style="border:0;" 
-        allowfullscreen="" 
-        loading="lazy" 
-        referrerpolicy="no-referrer-when-downgrade">
-    </iframe>
-</div>
+
+                <div class="rounded-3xl overflow-hidden shadow-2xl inline-block w-full border border-gray-800 h-[250px]">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4221.8430545221545!2d75.8030627!3d26.867326900000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396db5c3b469d459%3A0x9a055be452b02e03!2sGrras%20Solutions%20Pvt.%20Ltd.!5e1!3m2!1sen!2sin!4v1781174319293!5m2!1sen!2sin" 
+                        class="w-full h-full border-0 grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all duration-500" 
+                        allowfullscreen="" 
+                        loading="lazy" 
+                        referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
             </div>
 
-            <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-xs font-semibold text-gray-200 uppercase tracking-wider">
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm font-semibold text-gray-500 uppercase tracking-wider">
                 <p>&copy; 2026 Grras Solutions Pvt. Ltd. All rights reserved.</p>
-                
             </div>
         </div>
     </footer>
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const slider = document.getElementById('testimonialSlider');
-    const btnLeft = document.getElementById('slideLeft');
-    const btnRight = document.getElementById('slideRight');
-    
-    let autoScrollInterval;
-    const scrollDelay = 4000; // 4 seconds between auto slides
 
-    // Calculate how much to scroll based on the first card's width + gap
-    const getScrollAmount = () => {
-      const card = slider.querySelector('div');
-      // Adding 24px to account for the gap-6 class (1.5rem = 24px)
-      return card.clientWidth + 24; 
-    };
-
-    const scrollRight = () => {
-      // If we are at the end, rewind to the beginning
-      if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
-        slider.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        slider.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
-      }
-    };
-
-    const scrollLeft = () => {
-      // If we are at the beginning, go to the end
-      if (slider.scrollLeft <= 0) {
-        slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
-      } else {
-        slider.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
-      }
-    };
-
-    // Button event listeners
-    btnRight.addEventListener('click', () => {
-      scrollRight();
-      resetInterval();
-    });
-
-    btnLeft.addEventListener('click', () => {
-      scrollLeft();
-      resetInterval();
-    });
-
-    // Auto-scroll logic
-    const startInterval = () => {
-      autoScrollInterval = setInterval(scrollRight, scrollDelay);
-    };
-
-    const resetInterval = () => {
-      clearInterval(autoScrollInterval);
-      startInterval();
-    };
-
-    // Pause on hover
-    slider.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
-    slider.addEventListener('mouseleave', startInterval);
-
-    // Initialize
-    startInterval();
-  });
-</script>
-    <!-- Interactive Scripts -->
+    <!-- Scripts -->
     <script>
-        // Navbar Scroll Effect adapting to Dark/Light background transition
+        // Progress bar logic
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("scroll-progress").style.width = scrolled + "%";
+        });
+
+        // Testimonial Slider
+        document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('testimonialSlider');
+            const btnLeft = document.getElementById('slideLeft');
+            const btnRight = document.getElementById('slideRight');
+            
+            let autoScrollInterval;
+            const scrollDelay = 4000;
+
+            const getScrollAmount = () => {
+                const card = slider.querySelector('div');
+                return card.clientWidth + 32; // card width + gap
+            };
+
+            const scrollRight = () => {
+                if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 10) {
+                    slider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: getScrollAmount(), behavior: 'smooth' });
+                }
+            };
+
+            const scrollLeft = () => {
+                if (slider.scrollLeft <= 0) {
+                    slider.scrollTo({ left: slider.scrollWidth, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: -getScrollAmount(), behavior: 'smooth' });
+                }
+            };
+
+            btnRight.addEventListener('click', () => { scrollRight(); resetInterval(); });
+            btnLeft.addEventListener('click', () => { scrollLeft(); resetInterval(); });
+
+            const startInterval = () => { autoScrollInterval = setInterval(scrollRight, scrollDelay); };
+            const resetInterval = () => { clearInterval(autoScrollInterval); startInterval(); };
+
+            slider.addEventListener('mouseenter', () => clearInterval(autoScrollInterval));
+            slider.addEventListener('mouseleave', startInterval);
+
+            startInterval();
+        });
+
+        // Navbar Scroll Effect
         const navbar = document.getElementById('navbar');
         const navInner = document.getElementById('nav-inner');
-        const navTitle = document.getElementById('nav-title');
-        const navLinks = [document.getElementById('nav-link-1'), document.getElementById('nav-link-2'), document.getElementById('nav-link-3'), document.getElementById('nav-link-4')];
-        const mobileBtn = document.getElementById('mobile-menu-btn');
 
         window.addEventListener('scroll', () => {
             if (window.scrollY > 50) {
-                // Switch to light mode when scrolled past dark header
-                navInner.classList.remove('bg-white/50', 'border-white/10');
-                navInner.classList.add('bg-white/90', 'border-gray-200');
-                
-                navTitle.classList.remove('text-white');
-                navTitle.classList.add('text-black');
-                
-                navLinks.forEach(link => {
-                    link.classList.remove('text-gray-300', 'hover:text-white');
-                    link.classList.add('text-gray-600', 'hover:text-brand-purpleBtn');
-                });
-                
-                mobileBtn.classList.remove('text-white');
-                mobileBtn.classList.add('text-black');
+                navInner.classList.remove('bg-white/90');
+                navInner.classList.add('bg-white', 'shadow-md', 'py-4');
+                navInner.classList.remove('py-3');
             } else {
-                // Dark mode at top
-                navInner.classList.add('bg-white/90', 'border-white/10');
-                navInner.classList.remove('bg-white/90', 'border-gray-200');
-                
-                navTitle.classList.add('text-white');
-                navTitle.classList.remove('text-black');
-                
-                navLinks.forEach(link => {
-                    link.classList.add('text-gray-300', 'hover:text-white');
-                    link.classList.remove('text-gray-600', 'hover:text-brand-purpleBtn');
-                });
-
-                mobileBtn.classList.remove('text-black');
+                navInner.classList.add('bg-white/90');
+                navInner.classList.remove('bg-white', 'shadow-md', 'py-4');
+                navInner.classList.add('py-3');
             }
         });
 
-        // Scroll Reveal Animation
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
-                }
-            }
-        }
-        window.addEventListener("scroll", reveal);
-        reveal(); // Trigger on load
+        // Scroll Reveal Animation (Enhanced with intersection observer for performance and accuracy)
+        const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
+        
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target); // Only animate once
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => revealObserver.observe(el));
 
         // Smooth Scroll to Top Form
         function scrollToForm() {
             const formSection = document.getElementById('top-lead-form');
             const yOffset = -150; 
             const y = formSection.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            
             window.scrollTo({top: y, behavior: 'smooth'});
         }
+
+        // Stats Counter Animation
+        document.addEventListener("DOMContentLoaded", () => {
+            const counters = document.querySelectorAll('.counter');
+            let hasAnimated = false;
+
+            const animateCounters = () => {
+                counters.forEach(counter => {
+                    counter.innerText = '0';
+                    const updateCount = () => {
+                        const target = +counter.getAttribute('data-target');
+                        const count = +counter.innerText;
+                        const inc = target / 60; 
+
+                        if (count < target) {
+                            counter.innerText = Math.ceil(count + inc);
+                            setTimeout(updateCount, 30);
+                        } else {
+                            counter.innerText = target;
+                        }
+                    };
+                    updateCount();
+                });
+            };
+
+            const statsSection = document.getElementById('stats-section');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        animateCounters();
+                        hasAnimated = true;
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            if (statsSection) { observer.observe(statsSection); }
+        });
     </script>
-    <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const counters = document.querySelectorAll('.counter');
-    let hasAnimated = false;
-
-    const animateCounters = () => {
-      counters.forEach(counter => {
-        counter.innerText = '0';
-        
-        const updateCount = () => {
-          const target = +counter.getAttribute('data-target');
-          const count = +counter.innerText;
-          
-          // Speed settings (higher divisor = slower animation)
-          const inc = target / 60; 
-
-          if (count < target) {
-            counter.innerText = Math.ceil(count + inc);
-            setTimeout(updateCount, 30);
-          } else {
-            counter.innerText = target;
-          }
-        };
-        updateCount();
-      });
-    };
-
-    // Use Intersection Observer to trigger animation when the section is scrolled into view
-    const statsSection = document.getElementById('stats-section');
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !hasAnimated) {
-          animateCounters();
-          hasAnimated = true; // Ensure it only animates once
-        }
-      });
-    }, {
-      threshold: 0.5 // Trigger when 50% of the element is visible
-    });
-
-    if (statsSection) {
-      observer.observe(statsSection);
-    }
-  });
-</script>
 </body>
 </html>
