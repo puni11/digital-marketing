@@ -172,7 +172,7 @@
             width: 100%;
             padding: 1.25rem 0.5rem 0.5rem 1rem;
             background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(182, 182, 182, 0.2);
             border-radius: 8px;
             outline: none;
             transition: all 0.3s ease;
@@ -368,10 +368,10 @@
                         
                         <div class="mb-8">
                             <h3 class="text-2xl font-bold text-brand-darker mb-2">Start Your Journey</h3>
-                            <p class="text-gray-500 text-sm">Download the 2026 syllabus and get a free career consultation today.</p>
+                            <p class="text-gray-500 text-sm">Download the Broucher and get a free career consultation today.</p>
                         </div>
 
-                        <form id="mainForm" onsubmit="event.preventDefault(); alert('Form submitted! You are on your way to becoming a job-ready digital marketer.');" class="space-y-4">
+                        <form id="mainForm" class="space-y-4">
                             
                             <div class="dark-input-floating">
                                 <input type="text" id="fullName" placeholder=" " required class="border-gray-200 focus:border-brand-primary bg-gray-50 text-brand-darker">
@@ -400,9 +400,22 @@
                                     <i class="fa-solid fa-chevron-down text-sm"></i>
                                 </div>
                             </div>
-
+<div class="flex items-start gap-3 mt-4">
+    <input
+        type="checkbox"
+        id="consent"
+        required
+        class="mt-1 w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
+    >
+    <label for="consent" class="text-xs text-gray-600 leading-relaxed">
+        I agree to receive information about the Digital Marketing Course via
+        phone, WhatsApp, email, and SMS. I have read and agree to the <a href="https://grras.com/privacy-policy/" class="text-orange-400" target="_blank">Privacy
+        Policy</a> and consent to the processing of my personal data for course
+        inquiries and enrollment purposes.
+    </label>
+</div>
                             <button type="submit" class="w-full mt-6 bg-brand-darker text-white font-semibold text-base py-4 rounded-xl hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5">
-                                Download Brochure
+                                Download Broucher
                             </button>
 
                             <p class="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1.5 font-medium">
@@ -1414,5 +1427,70 @@
             if (statsSection) { observer.observe(statsSection); }
         });
     </script>
+   <script>
+const form = document.getElementById("mainForm");
+
+function getUTMParams() {
+    const params = new URLSearchParams(window.location.search);
+
+    return {
+        utm_source: params.get("utm_source") || "",
+        utm_medium: params.get("utm_medium") || "",
+        utm_campaign: params.get("utm_campaign") || "",
+        utm_term: params.get("utm_term") || "",
+        utm_content: params.get("utm_content") || "",
+        gcid: params.get("gclid") || "",
+    };
+}
+
+form.addEventListener("submit", async function (e) {
+
+    e.preventDefault();
+
+    const utms = getUTMParams();
+
+    const formData = new FormData();
+
+    formData.append("name", document.getElementById("fullName").value);
+    formData.append("email", document.getElementById("email").value);
+    formData.append("phone", document.getElementById("phone").value);
+    formData.append("profile", document.getElementById("experience").value);
+    formData.append("consent", document.getElementById("consent").checked);
+
+    formData.append("date", new Date().toLocaleString("en-IN"));
+
+    formData.append("utm_source", utms.utm_source);
+    formData.append("utm_medium", utms.utm_medium);
+    formData.append("utm_campaign", utms.utm_campaign);
+    formData.append("utm_term", utms.utm_term);
+    formData.append("utm_content", utms.utm_content);
+
+    formData.append("gcid", utms.gcid);
+
+    try {
+
+        await fetch(
+            "https://script.google.com/macros/s/AKfycbx8-wAPHT8sLDeTo2DGiOMMcVPjXhSz2rci1N_TSYxOY8OYrMmVgjK7euBYZOnRJ4cGng/exec",
+            {
+                method: "POST",
+                mode: "no-cors",
+                body: formData
+            }
+        );
+
+        alert("Thank you! Your brochure download request has been received.");
+
+        form.reset();
+
+        window.open("brochure.pdf", "_blank");
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Something went wrong. Please try again.");
+    }
+});
+</script>
 </body>
 </html>
