@@ -261,6 +261,57 @@ body {
             box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.08), 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
     </style>
+    <!-- Font Awesome -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+/>
+
+<!-- Floating WhatsApp Button -->
+<a
+  href="https://wa.me/919145840133"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="whatsapp-float"
+  aria-label="Chat on WhatsApp"
+>
+  <i class="fab fa-whatsapp"></i>
+</a>
+
+<style>
+.whatsapp-float {
+  position: fixed;
+  width: 60px;
+  height: 60px;
+  bottom: 20px;
+  right: 20px;
+  background: #25d366;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 9999;
+  transition: transform 0.3s ease;
+}
+
+.whatsapp-float:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .whatsapp-float {
+    width: 55px;
+    height: 55px;
+    font-size: 28px;
+    bottom: 15px;
+    right: 15px;
+  }
+}
+</style>
 </head>
 <body class="antialiased selection:bg-brand-primary selection:text-white relative">
 <div class="relative w-full overflow-hidden">
@@ -419,9 +470,13 @@ body {
         inquiries and enrollment purposes.
     </label>
 </div>
-                            <button type="submit" class="w-full mt-6 bg-brand-darker text-white font-semibold text-base py-4 rounded-lg hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5">
-                                Download Broucher
-                            </button>
+                          <button type="submit" id="submitBtn" class="w-full mt-6 flex items-center justify-center gap-2 bg-brand-darker text-white font-semibold text-base py-4 rounded-lg hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none">
+    <span id="btnText">Download Broucher</span>
+    <svg id="btnSpinner" class="hidden w-5 h-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+</button>
 
                             <p class="text-xs text-center text-gray-400 mt-4 flex items-center justify-center gap-1.5 font-medium">
                                 <i class="fa-solid fa-shield-halved text-brand-primary"></i> Your information is 100% secure.
@@ -1259,9 +1314,9 @@ body {
                         <svg class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         +91 91458 40133
                     </a>
-                    <a href="mailto:hello@digitalprogram.com" class="inline-flex mt-4 items-center justify-center w-full gap-3 bg-white hover:border-brand-primary transition-colors text-brand-darker font-bold text-[16px] py-4 px-6 rounded-xl border border-gray-200 shadow-sm">
+                    <a href="mailto:training@grras.com" class="inline-flex mt-4 items-center justify-center w-full gap-3 bg-white hover:border-brand-primary transition-colors text-brand-darker font-bold text-[16px] py-4 px-6 rounded-xl border border-gray-200 shadow-sm">
                         <svg class="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        hello@digitalprogram.com
+                        training@grras.com
                     </a>
                 </div>
             </div>
@@ -1356,7 +1411,15 @@ body {
             </div>
         </div>
     </section>
-
+<a
+  href="https://wa.me/919145840133"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="whatsapp-float"
+  aria-label="Chat on WhatsApp"
+>
+  <i class="fab fa-whatsapp"></i>
+</a>
     <!-- ================= FOOTER ================= -->
     <footer class="bg-brand-darker pt-20 pb-10 border-t border-gray-800 text-white relative overflow-hidden">
         <div class="container mx-auto px-6 lg:px-12 relative z-10">
@@ -1549,13 +1612,20 @@ function getUTMParams() {
         gcid: params.get("gclid") || "",
     };
 }
-
 form.addEventListener("submit", async function (e) {
-
     e.preventDefault();
 
-    const utms = getUTMParams();
+    // 1. Grab button elements
+    const submitBtn = document.getElementById("submitBtn");
+    const btnText = document.getElementById("btnText");
+    const btnSpinner = document.getElementById("btnSpinner");
 
+    // 2. Set loading state
+    submitBtn.disabled = true;
+    btnText.innerText = "Processing...";
+    btnSpinner.classList.remove("hidden");
+
+    const utms = getUTMParams();
     const formData = new FormData();
 
     formData.append("name", document.getElementById("fullName").value);
@@ -1563,19 +1633,15 @@ form.addEventListener("submit", async function (e) {
     formData.append("phone", document.getElementById("phone").value);
     formData.append("profile", document.getElementById("experience").value);
     formData.append("consent", document.getElementById("consent").checked);
-
     formData.append("date", new Date().toLocaleString("en-IN"));
-
     formData.append("utm_source", utms.utm_source);
     formData.append("utm_medium", utms.utm_medium);
     formData.append("utm_campaign", utms.utm_campaign);
     formData.append("utm_term", utms.utm_term);
     formData.append("utm_content", utms.utm_content);
-
     formData.append("gcid", utms.gcid);
 
     try {
-
         await fetch(
             "https://script.google.com/macros/s/AKfycbx8-wAPHT8sLDeTo2DGiOMMcVPjXhSz2rci1N_TSYxOY8OYrMmVgjK7euBYZOnRJ4cGng/exec",
             {
@@ -1586,18 +1652,20 @@ form.addEventListener("submit", async function (e) {
         );
 
         alert("Thank you! Your brochure download request has been received.");
-
         form.reset();
-
         window.open("brochure.pdf", "_blank");
 
     } catch (error) {
-
         console.error(error);
-
         alert("Something went wrong. Please try again.");
+    } finally {
+        // 3. Restore original button state
+        submitBtn.disabled = false;
+        btnText.innerText = "Download Broucher";
+        btnSpinner.classList.add("hidden");
     }
 });
+
 </script>
 </div>
 </body>
