@@ -75,13 +75,17 @@
 
     <!-- Custom Styles & Animations -->
     <style>
-        html { scroll-behavior: smooth; }
-        body {
-            color: #111827;
-            background-color: #F9FAFB;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
+       html, body {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    width: 100%;
+    position: relative;
+}
+body {
+    color: #111827;
+    background-color: #F9FAFB;
+    -webkit-font-smoothing: antialiased;
+}
 
         /* Top Progress Bar */
         #scroll-progress {
@@ -259,7 +263,7 @@
     </style>
 </head>
 <body class="antialiased selection:bg-brand-primary selection:text-white relative">
-
+<div class="relative w-full overflow-hidden">
     <!-- Scroll Progress Bar -->
     <div id="scroll-progress"></div>
 
@@ -269,7 +273,7 @@
             <div id="nav-inner" class="bg-white/90 backdrop-blur-md rounded-xl px-8 py-3 flex justify-between items-center shadow-sm border border-gray-200 transition-colors duration-300">
                 <!-- Logo -->
                 <a href="#" class="flex items-center gap-3 group">
-                    <img src="https://openshift.grras.com/frontassets/img/logo.png" alt="logo" class="w-16 opacity-90 group-hover:grayscale-0 transition-all duration-300"/>
+                    <img src="https://openshift.grras.com/frontassets/img/logo.png" alt="logo" fetchpriority="high" class="w-16 opacity-90 group-hover:grayscale-0 transition-all duration-300"/>
                 </a>
 
                 <!-- Desktop Menu -->
@@ -287,8 +291,9 @@
                 </button>
 
                 <!-- Mobile Hamburger -->
-                <button onclick="scrollToForm()" class="md:hidden text-brand-darker p-2" id="mobile-menu-btn">
-                    <i class="fa-solid fa-bars text-xl"></i>
+                <button onclick="scrollToForm()" class="md:hidden flex items-center gap-2 btn-primary-img px-5 py-2 font-medium text-sm transition-all duration-300 transform hover:-translate-y-0.5" id="mobile-menu-btn">
+                    Apply Now
+
                 </button>
             </div>
         </div>
@@ -364,7 +369,7 @@
                 <div class="lg:w-[45%] w-full max-w-md mx-auto relative z-20 reveal-right delay-200" id="top-lead-form">
                     
                     <!-- Form Card -->
-                    <div class="bg-white rounded-2xl p-8 lg:p-10 shadow-2xl relative border-t-4 border-brand-primary">
+                    <div class="bg-white rounded-xl p-8 lg:p-10 shadow-2xl relative border-t-4 border-brand-primary">
                         
                         <div class="mb-8">
                             <h3 class="text-2xl font-bold text-brand-darker mb-2">Start Your Journey</h3>
@@ -414,7 +419,7 @@
         inquiries and enrollment purposes.
     </label>
 </div>
-                            <button type="submit" class="w-full mt-6 bg-brand-darker text-white font-semibold text-base py-4 rounded-xl hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5">
+                            <button type="submit" class="w-full mt-6 bg-brand-darker text-white font-semibold text-base py-4 rounded-lg hover:bg-black transition-all duration-300 shadow-lg transform hover:-translate-y-0.5">
                                 Download Broucher
                             </button>
 
@@ -558,7 +563,7 @@
                 </ul>
             </div>
 
-            <div class="relative w-full h-[550px] rounded-[2rem] overflow-hidden order-first lg:order-none mb-8 lg:mb-0 reveal shadow-2xl border border-gray-100">
+            <div class="relative w-full h-[550px] rounded-[1rem] overflow-hidden order-first lg:order-none mb-8 lg:mb-0 reveal shadow-2xl border border-gray-100">
                 <div class="absolute inset-0 bg-brand-primary/10 mix-blend-multiply z-10 pointer-events-none"></div>
                 <img src="girl.png" alt="Student engaging with digital marketing material" class="w-full h-full object-cover transition-transform duration-700 hover:scale-105" />
             </div>
@@ -613,8 +618,8 @@
             <!-- Feature 1: AI First -->
             <div class="flex flex-col lg:flex-row items-center gap-16 mb-24 reveal-left">
                 <div class="lg:w-1/2">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
-                        <i class="fa-solid fa-wand-magic-sparkles text-2xl text-brand-primary"></i>
+                    <div class="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
+                        <i class="fa-solid fa-wand-magic-sparkles text-xl text-brand-primary"></i>
                     </div>
                     <h3 class="text-3xl font-bold text-brand-darker mb-6">AI-First Curriculum</h3>
                     <p class="text-gray-600 leading-relaxed mb-6 text-md">
@@ -628,7 +633,7 @@
                     </button>
                 </div>
                 <div class="lg:w-1/2 relative w-full">
-                    <div class="w-full bg-gradient-to-br from-brand-accent to-orange-50 rounded-3xl text-white relative shadow-2xl border border-orange-100 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
+                    <div class="w-full bg-gradient-to-br from-brand-accent to-orange-50 rounded-xl text-white relative shadow-2xl border border-orange-100 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
                         <div class="absolute inset-0 bg-brand-primary mix-blend-overlay opacity-20 group-hover:opacity-10 transition-opacity duration-500"></div>
                         <img src="ai.png" alt="AI Technology" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
                     </div>
@@ -638,7 +643,7 @@
             <!-- Feature 2: WhatsApp & India Market -->
             <div class="flex flex-col lg:flex-row-reverse items-center gap-16 reveal-right">
                 <div class="lg:w-1/2">
-                    <div class="w-16 h-16 rounded-2xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
+                    <div class="w-12 h-12 rounded-xl bg-brand-primary/10 flex items-center justify-center mb-8 shadow-sm">
                         <i class="fa-brands fa-whatsapp text-3xl text-brand-primary"></i>
                     </div>
                     <h3 class="text-3xl font-bold text-brand-darker mb-6">WhatsApp-First India Market</h3>
@@ -655,7 +660,7 @@
                     </ul>
                 </div>
                 <div class="lg:w-1/2 relative w-full">
-                   <div class="w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl text-white relative shadow-2xl border border-gray-200 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
+                   <div class="w-full bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl text-white relative shadow-2xl border border-gray-200 overflow-hidden aspect-square lg:aspect-auto lg:h-[500px] group">
                         <div class="absolute inset-0 bg-brand-dark mix-blend-overlay opacity-30 group-hover:opacity-10 transition-opacity duration-500"></div>
                         <img src="wau.png" alt="Social Media Analytics" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"/>
                     </div>
@@ -679,7 +684,7 @@
             <div class="max-w-7xl mx-auto space-y-4">
 
                 <!-- Module 1 -->
-                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
+                <div class="bg-white border-2 border-gray-100 rounded-xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
                     <input type="checkbox" id="mod1" class="accordion-input hidden">
                     <label for="mod1" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
                         <div class="flex items-center gap-6">
@@ -709,7 +714,7 @@
                 </div>
 
                 <!-- Module 2 -->
-                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale delay-100">
+                <div class="bg-white border-2 border-gray-100 rounded-xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale delay-100">
                     <input type="checkbox" id="mod2" class="accordion-input hidden">
                     <label for="mod2" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
                         <div class="flex items-center gap-6">
@@ -740,34 +745,34 @@
 
                 <!-- Grid Summary for 3-10 -->
                 <div class="grid md:grid-cols-2 gap-4 mt-8 mb-8 reveal">
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">03. SEO + AI Search </h4>
                         <p class="text-gray-500 text-sm">Google AI Overviews, E-E-A-T, On-page, Off-page, Technical SEO.</p>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">04. Performance Ads</h4>
                         <p class="text-gray-500 text-sm">Google Ads (PMax), Meta Advantage+, Tracking setup.</p>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">05. Social & Influencer </h4>
                         <p class="text-gray-500 text-sm">Growth: Reels strategy, LinkedIn B2B, UGC, Influencer contracts.</p>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">06. Content & Copywriting </h4>
                         <p class="text-gray-500 text-sm">Pillar models, Hook formulas, Copy psychology, Video scripts.</p>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">07. Email & WhatsApp </h4>
                         <p class="text-gray-500 text-sm">DMARC, HubSpot/Zoho pipelines, WhatsApp automation flows.</p>
                     </div>
-                    <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
+                    <div class="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-brand-primary/40 transition-colors">
                         <h4 class="font-bold text-brand-darker text-lg mb-2">08. Analytics & Data </h4>
                         <p class="text-gray-500 text-sm">GA4 deep-dive, GTM, Server-side tracking, Looker Studio.</p>
                     </div>
                 </div>
 
                 <!-- Module 11 -->
-                <div class="bg-white border-2 border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
+                <div class="bg-white border-2 border-gray-100 rounded-xl overflow-hidden shadow-sm hover:border-brand-primary/30 transition-all reveal-scale">
                     <input type="checkbox" id="mod11" class="accordion-input hidden">
                     <label for="mod11" class="w-full px-6 py-6 flex justify-between items-center cursor-pointer hover:bg-gray-50 transition-colors group">
                         <div class="flex items-center gap-6">
@@ -867,7 +872,7 @@
 
                 <div class="flex flex-col relative space-y-4">
                     
-                    <div class="sticky top-[100px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                    <div class="sticky top-[100px] bg-white rounded-lg p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
                         <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                         </div>
@@ -880,7 +885,7 @@
                         </p>
                     </div>
 
-                    <div class="sticky top-[120px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                    <div class="sticky top-[120px] bg-white rounded-lg p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
                         <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                         </div>
@@ -893,7 +898,7 @@
                         </p>
                     </div>
 
-                    <div class="sticky top-[140px] bg-white rounded-3xl p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
+                    <div class="sticky top-[140px] bg-white rounded-lg p-8 sm:p-10 border border-gray-100 shadow-xl transition-all">
                         <div class="mb-6 w-14 h-14 rounded-2xl bg-brand-accent text-brand-primary flex items-center justify-center">
                             <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
                         </div>
@@ -910,7 +915,7 @@
             </div>
 
             <div class="w-full lg:w-1/2 h-[50vh] lg:h-auto relative mt-8 reveal-right">
-                <div class="sticky top-[100px] w-full h-[calc(100vh-200px)] rounded-3xl overflow-hidden shadow-2xl border border-gray-200 group">
+                <div class="sticky top-[100px] w-full h-[calc(100vh-200px)] rounded-xl overflow-hidden shadow-2xl border border-gray-200 group">
                     <div class="absolute inset-0 bg-brand-dark mix-blend-overlay opacity-20 group-hover:opacity-0 transition-opacity duration-500 z-10"></div>
                     <img src="stu.png" alt="Team reviewing data and strategy" class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-105" />
                 </div>
@@ -935,7 +940,7 @@
             <div class="grid lg:grid-cols-3 gap-6">
                 
                 <!-- Track 1 -->
-                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300">
+                <div class="bg-gray-50 rounded-xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300">
                     <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
                         <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 13l2.5-2.5 2 2 3.5-3.5"></path></svg>
                     </div>
@@ -947,7 +952,7 @@
                 </div>
 
                 <!-- Track 2 -->
-                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-100">
+                <div class="bg-gray-50 rounded-xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-100">
                     <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
                         <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3" stroke-width="2"></circle><circle cx="6" cy="12" r="3" stroke-width="2"></circle><circle cx="18" cy="19" r="3" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"></path></svg>
                     </div>
@@ -959,7 +964,7 @@
                 </div>
 
                 <!-- Track 3 -->
-                <div class="bg-gray-50 rounded-3xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-200">
+                <div class="bg-gray-50 rounded-xl p-8 border border-gray-200 reveal hover:border-brand-primary/40 hover:shadow-xl transition-all duration-300 delay-200">
                     <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-gray-100">
                         <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" stroke-width="2"></circle><circle cx="12" cy="12" r="5" stroke-width="2"></circle><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12l8-8M15 4h5v5"></path></svg>
                     </div>
@@ -971,7 +976,7 @@
                 </div>
 
                 <!-- Track 4 (Wide Dark) -->
-                <div class="lg:col-span-2 bg-brand-darker rounded-3xl p-10 shadow-2xl reveal relative overflow-hidden text-white flex flex-col justify-center border border-gray-800 group hover:-translate-y-1 transition-all duration-300">
+                <div class="lg:col-span-2 bg-brand-darker rounded-xl p-10 shadow-2xl reveal relative overflow-hidden text-white flex flex-col justify-center border border-gray-800 group hover:-translate-y-1 transition-all duration-300">
                     <div class="absolute inset-0 bg-brand-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-2xl"></div>
                     <div class="relative z-10">
                         <div class="w-14 h-14 bg-gray-800 rounded-2xl flex items-center justify-center mb-6 border border-gray-700">
@@ -983,7 +988,7 @@
                 </div>
 
                 <!-- Track 5 (Orange Accent) -->
-                <div class="bg-brand-primary rounded-3xl p-10 shadow-glow reveal flex flex-col justify-center text-white hover:bg-brand-primaryHover transition-colors duration-300 group hover:-translate-y-1">
+                <div class="bg-brand-primary rounded-xl p-10 shadow-glow reveal flex flex-col justify-center text-white hover:bg-brand-primaryHover transition-colors duration-300 group hover:-translate-y-1">
                     <div class="w-14 h-14 bg-white text-brand-primary rounded-2xl flex items-center justify-center mb-6 shadow-lg">
                         <svg class="w-7 h-7 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" stroke-width="2"></rect><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M12 11v6M9 14l3-3 3 3"></path></svg>
                     </div>
@@ -1226,14 +1231,6 @@
 
 </section>
 
-<style>
-.no-scrollbar::-webkit-scrollbar{
-    display:none;
-}
-.no-scrollbar{
-    scrollbar-width:none;
-}
-</style>
 
 
         </div>
@@ -1602,5 +1599,6 @@ form.addEventListener("submit", async function (e) {
     }
 });
 </script>
+</div>
 </body>
 </html>
