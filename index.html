@@ -1660,12 +1660,9 @@ form.addEventListener("submit", async function (e) {
         if (!response.ok) {
             throw new Error(data.error || "Something went wrong");
         }
-
-        alert("Thank you! Your brochure download request has been received.");
+ window.open("brochure.pdf", "_blank");
 
         form.reset();
-
-        window.open("brochure.pdf", "_blank");
 
     } catch (error) {
         console.error(error);
