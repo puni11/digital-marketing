@@ -312,8 +312,25 @@ body {
   }
 }
 </style>
+<script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+
+    fbq('init', '1006331458758127');
+    fbq('track', 'PageView');
+    </script>
 </head>
 <body class="antialiased selection:bg-brand-primary selection:text-white relative">
+    <noscript>
+        <img height="1" width="1" style="display:none"
+        src="https://www.facebook.com/tr?id=1006331458758127&ev=PageView&noscript=1"/>
+    </noscript>
 <div class="relative w-full overflow-hidden">
     <!-- Scroll Progress Bar -->
     <div id="scroll-progress"></div>
@@ -1660,6 +1677,11 @@ form.addEventListener("submit", async function (e) {
         if (!response.ok) {
             throw new Error(data.error || "Something went wrong");
         }
+        fbq('track', 'Lead');
+
+  fbq('trackCustom', 'FormSubmitted', {
+    form_name: 'Contact Form'
+  });
  window.open("brochure.pdf", "_blank");
 
         form.reset();
