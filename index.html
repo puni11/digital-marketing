@@ -1633,7 +1633,11 @@ function getUTMParams() {
         campaign: params.get("utm_campaign") || "",
         term: params.get("utm_term") || "",
         content: params.get("utm_content") || "",
-        gclid: params.get("gclid") || ""
+        gclid: params.get("gclid") || "",
+        fbclid: params.get("fbclid") || "",
+    landing_page: window.location.href,
+    page_path: window.location.pathname,
+    referrer: document.referrer || "Direct",
     };
 }
 
@@ -1659,13 +1663,17 @@ form.addEventListener("submit", async function (e) {
             profile: document.getElementById("experience").value,
 
             consent: document.getElementById("consent").checked,
-
+            course: "Digital Marketing",
             source: utms.source,
             medium: utms.medium,
             campaign: utms.campaign,
             term: utms.term,
             content: utms.content,
-            gclid: utms.gclid
+            gclid: utms.gclid,
+             fbclid: utms.fbclid,
+    landing_page: utms.landing_page,
+    page_path: utms.page_path,
+    referrer: utms.referrer
         };
 
         const response = await fetch(
